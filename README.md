@@ -9,3 +9,6 @@ For instance: DEV_DATABASE_URL='postgresql://user234:password@localhost:5432/can
 
 If there is no database set up, currently it will default to using
 "sqlite:///' + os.path.join(basedir, 'data-dev.sqlite)"
+
+
+Routes syntax is: http://127.0.0.1:5000/api/"resource_name"
