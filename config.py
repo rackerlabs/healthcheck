@@ -17,10 +17,10 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+        'postgresql://aded0190:helloworld@localhost:5432/canaryDB'
 
     # 'postgresql://aded0190:helloworld@localhost:5432/canaryDB'
-
+    #  sqlite:///' + os.path.join(basedir, 'data-dev.sqlite)
 
 class TestingConfig(Config):
     TESTING = True

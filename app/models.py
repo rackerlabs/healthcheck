@@ -1,5 +1,4 @@
-import tables
-from flask import current_app, request, url_for
+from flask import jsonify
 from . import db
 
 
@@ -60,15 +59,18 @@ class Projects(db.Model):
         db.session.commit()
         return project
 
-
-
     def get_tests(self):
         pass
 
-    def edit_project(self):
-        pass
 
-    def delete_project(self):
-        pass
+    def delete_project(project):
+      name = project.name
+      db.session.delete(project)
+      db.session.commit()
+      message = "Deleted project '%s' " % name
+      response = jsonify(message=message)
+      response.status_code = 201
+      return response
+
 
 

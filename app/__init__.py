@@ -1,12 +1,9 @@
 # initialising and setting stuff up for the app
 from flask import Flask
-from flask.ext.bootstrap import Bootstrap
-from flask.ext.moment import Moment
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 from config import config
 
-bootstrap = Bootstrap()
-moment = Moment()
+
 db = SQLAlchemy()
 
 
@@ -15,9 +12,9 @@ def create_app(config_name):
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
-    bootstrap.init_app(app)
-    moment.init_app(app)
     db.init_app(app)
+    # with app.app_context():
+    #    db.create_all()
 
     from .api import api as api_blueprint
     app.register_blueprint(api_blueprint, url_prefix='/api')
