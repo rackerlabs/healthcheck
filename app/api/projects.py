@@ -23,7 +23,7 @@ def projects():
         new_project = Projects(**post_request)
         db.session.add(new_project)
         db.session.commit()
-        post_response = jsonify(project_id=new_project.id, project_name=new_project.name)
+        post_response = jsonify(id=new_project.id, name=new_project.name)
         post_response.status_code = 201
         return post_response
         # return jsonify(project_name=project.name), 201, {'Location': url_for('api.project', id=project.id, _external=True)}
@@ -47,7 +47,7 @@ def project(project_id):
         name = project.name
         db.session.delete(project)
         db.session.commit()
-        response = jsonify(message="Deleted project '%s' " % name)
+        response = jsonify(message="Deleted project %s" % name)
         response.status_code = 200
         return response
 
@@ -61,8 +61,8 @@ def project(project_id):
         project.dependencies = data.get('dependencies') or project.dependencies
         project.description = data.get('description') or project.description
         db.session.commit()
-        # DO A DB QUERY TO CHECK IF EDIT WAS SUCCESSFUL (UNIT TEST TO THE RESCUE???)
-        put_response = jsonify(project=project.to_json())
+        put_response = jsonify(project.to_json())
         put_response.status_code = 200
         return put_response
+
 
