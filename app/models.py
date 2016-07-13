@@ -1,8 +1,8 @@
 from flask import jsonify, json
 from flask import current_app
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import *
+from sqlalchemy.dialects.sqlite import *
 from . import db
-
 
 
 class Projects(db.Model):
@@ -46,26 +46,30 @@ class Canary(db.Model):
     __tablename__ = 'canaries'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column('name', db.String(256), unique=True)
-    description = db.Column('description', db.String(256))
-    data = db.Column(JSON)
+    description = db.Column('description', db.String(256))  # SAME AS DATA??
+    status = db.Column('status', db.String(256))
     criteria = db.Column(JSON)
+    trendtime = db.Column(JSONB)
+    health = db.Column('health', db.String(256))
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
+    # data = db.Column(JSON)
 
-    def __init__(self, name, criteria, data=None, description=None, id=None):
+    def __init__(self, name, criteria, trendtime, description=None, id=None):
         self.name = name
         self.description = description
-        self.data = data
         self.criteria = criteria
+        self.trendtime = trendtime
+        # self.data = data
         self.id = id
 
     def canary_to_json(self):
         return {
             'name': self.name,
             'description': self.description,
-            'data': self.data,
+            'status': self.status,
             'criteria': self.criteria,
+            'trendtime': self.trendtime,
+            'health': self.health,
             'id': self.id
+            # 'data': self.data
         }
-
-
-
