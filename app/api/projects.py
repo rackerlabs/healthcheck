@@ -1,4 +1,4 @@
-from flask import jsonify, request,url_for
+from flask import jsonify, request, url_for
 from .. import db
 from ..models import Projects
 from . import api
@@ -12,7 +12,8 @@ def projects():
         all_projects = query.all()
         projects_list = []
         for obj in all_projects:
-            project = Projects(name=obj.name, email=obj.email, description=obj.description, dependencies=obj.dependencies, id=obj.id)
+            project = Projects(name=obj.name, email=obj.email, description=obj.description,
+                               dependencies=obj.dependencies, id=obj.id)
             projects_list.append(project.to_json())
         get_response = jsonify(projects=projects_list)
         get_response.status_code = 200
@@ -26,7 +27,6 @@ def projects():
         post_response = jsonify(id=new_project.id, name=new_project.name)
         post_response.status_code = 201
         return post_response
-        # return jsonify(project_name=project.name), 201, {'Location': url_for('api.project', id=project.id, _external=True)}
 
 
 @api.route('/projects/<int:project_id>', methods=['GET', 'PUT', 'DELETE'])
@@ -47,9 +47,7 @@ def project(project_id):
         name = project.name
         db.session.delete(project)
         db.session.commit()
-        response = jsonify(message="Deleted project %s" % name)
-        response.status_code = 200
-        return response
+        return '', 204
 
     elif request.method == 'PUT':
         project = Projects.query.get(project_id)
@@ -64,5 +62,3 @@ def project(project_id):
         put_response = jsonify(project.to_json())
         put_response.status_code = 200
         return put_response
-
-

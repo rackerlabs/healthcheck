@@ -11,38 +11,35 @@ def new_canary(project_id):
         post_request = request.get_json()
         post_request['project_id'] = project_id
         new_canary = Canary(**post_request)
-        canary_project = Projects.query.get(project_id)  # is this worth it?
         db.session.add(new_canary)
         db.session.commit()
-        post_response = jsonify(id=new_canary.id, name=new_canary.name, status=new_canary.status,
-                                project=canary_project.name)
+        post_response = jsonify(**new_canary.canary_to_json())
         post_response.status_code = 201
         return post_response
 
 
 @api.route('/projects/<int:project_id>/canary', methods=['GET'])
 def get_canaries(project_id):
-    all_canaries = Canary.query.filter_by(project_id=project_id)
+    all_canaries = Canary.query.filter_by(project_id=project_id).filter_by(status="ACTIVE")
     canary_list = []
     for obj in all_canaries:
-        if obj.status == "ACTIVE":
-            canary_list.append(obj.canary_to_json())
+        canary_list.append(obj.canary_to_json())
     get_response = jsonify(canaries=canary_list)
     get_response.status_code = 200
     return get_response
 
-@api.route('/projects/<int:project_id>/<int:canary_id>', methods=['GET'])
+
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>', methods=['GET'])
 def get_canary(project_id, canary_id):
     canary = Canary.query.get(canary_id)
     if canary is None or canary.project_id != project_id:
         return bad_request('canary not found')
-    get_response = jsonify(canary.canary_to_json())
+    get_response = jsonify(**canary.canary_to_json())
     get_response.status_code = 200
     return get_response
-    # HEALTH DETAILS OVER TIME COMING SOON...
 
 
-@api.route('/projects/<int:project_id>/<int:canary_id>', methods=['PUT'])
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>', methods=['PUT'])
 def edit_canary(project_id, canary_id):
     canary = Canary.query.get(canary_id)
     if canary is None or canary.project_id != project_id:
@@ -53,20 +50,25 @@ def edit_canary(project_id, canary_id):
     canary.data = data.get('data') or canary.data
     canary.criteria = data.get('criteria') or canary.criteria
     db.session.commit()
-    put_response = jsonify(canary.canary_to_json())
+    put_response = jsonify(**canary.canary_to_json())
     put_response.status_code = 200
     return put_response
 
 
-@api.route('/projects/<int:project_id>/<int:canary_id>', methods=['DELETE'])
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>', methods=['DELETE'])
 def delete_canary(canary_id, project_id):
     canary = Canary.query.get(canary_id)
     if canary is None or canary.project_id != project_id:
-        return bad_request('not found')
+        return bad_request('canary not found')
     name = canary.name
-    # db.session.delete(canary)
+    if canary.status == "DISABLED":
+        db.session.delete(canary)
+        db.session.commit()
+        response = jsonify("Deleted canary '%s' " % name)
+        response.status_code = 200
+        return response
     canary.status = "DISABLED"
     db.session.commit()
-    response = jsonify(message="Deleted canary '%s' " % name)  # CHANGE MESSAGE?
-    response.status_code = 200
+    response = jsonify("Disabled canary '%s' " % name)
+    response.status_code = 204
     return response

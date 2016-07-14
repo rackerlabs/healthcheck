@@ -1,7 +1,4 @@
-from flask import jsonify, json
-from flask import current_app
 from sqlalchemy.dialects.postgresql import *
-from sqlalchemy.dialects.sqlite import *
 from . import db
 
 
@@ -34,6 +31,7 @@ class Projects(db.Model):
             'description': self.description,
             'id': self.id
         }
+
 
 class Canary(db.Model):
     __tablename__ = 'canaries'
