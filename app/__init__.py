@@ -1,4 +1,3 @@
-# initialising and setting stuff up for the app
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import config
@@ -6,7 +5,7 @@ from config import config
 
 db = SQLAlchemy()
 
-
+import models
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
