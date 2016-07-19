@@ -7,6 +7,11 @@ data = {'name': 'test project',
         'email': 'test@rackspace.com',
         'description': 'A test project',
         'dependencies': 'projectA'}
+expected_data = {'id': 1,
+                 'name': 'test project',
+                 'email': 'test@rackspace.com',
+                 'description': 'A test project',
+                 'dependencies': 'projectA'}
 
 
 class ProjectsTest(unittest.TestCase):
@@ -43,13 +48,12 @@ class ProjectsTest(unittest.TestCase):
             db.session.add(u)
             try:
                 db.session.commit()
-            except IntegrityError:  # WHAT HAPPENS IF THE ERROR HAPPENED HERE
+            except IntegrityError:
                 db.session.rollback()
             all_projects.append(u)
 
         if len(all_projects) != count:
             print "ERROR : Number of projects in database is less than count "
-            # maybe return here??
         return all_projects
 
     def test_post_project(self):
@@ -81,13 +85,7 @@ class ProjectsTest(unittest.TestCase):
         get_response = self.client.get('api/projects/1', content_type='application/json')
         self.assertEquals(get_response.status_code, 200)
         json_data = json.loads(get_response.data)
-        self.assertEquals(json_data.get('id'), 1, "project id does not match")
-        self.assertEquals(json_data.get('name'), data.get('name'), "project name does not match")
-        self.assertEquals(json_data.get('email'), data.get('email'), "project email does not match")
-        self.assertEquals(json_data.get('description'), data.get('description'), "project description does not match")
-        self.assertEquals(json_data.get('dependencies'), data.get('dependencies'),
-                          "project dependencies does not match")
-        # WON'T HAVE THESE 4 LINES BUT FOR THE ALPHABETICAL ORDER ISSUE
+        self.assertEquals(sorted(json_data.items()), sorted(expected_data.items()))
 
     def test_put_project(self):
         self.helper_post()
@@ -101,12 +99,5 @@ class ProjectsTest(unittest.TestCase):
     def test_delete_project(self):
         self.helper_post()
         del_response = self.client.delete('api/projects/1')
-        self.assertEquals(del_response.status_code, 200)
-        expected = "Deleted project test project"
-        self.assertEquals(json.loads(del_response.data).get('message'), expected)
+        self.assertEquals(del_response.status_code, 204)
 
-        #     #WHAT HAPPENS ON BAD URL?
-
-
-if __name__ == '__main__':
-    unittest.main()

@@ -44,7 +44,6 @@ def project(project_id):
         project = Projects.query.get(project_id)
         if project is None:
             return bad_request('project_id not found')
-        name = project.name
         db.session.delete(project)
         db.session.commit()
         return '', 204

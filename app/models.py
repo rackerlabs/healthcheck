@@ -1,5 +1,6 @@
-from sqlalchemy.dialects.postgresql import *
 from . import db
+from sqlalchemy.dialects.postgresql import *
+from datetime import datetime
 
 
 class Projects(db.Model):
@@ -38,17 +39,19 @@ class Canary(db.Model):
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
     name = db.Column('name', db.String(256), unique=True)
     description = db.Column('description', db.String(256))
-    data = db.Column('data', JSON)
+    meta_data = db.Column('data', JSON)
     status = db.Column('status', db.String(256))
     criteria = db.Column('criteria', JSON)
     health = db.Column('health', db.String(256))
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
+    canary_results = db.relationship('CanaryResults', backref='canary', lazy='dynamic')
 
-    def __init__(self, name, description=None, data=None, status='ACTIVE', criteria=None, health='GREEN', id=None,
+
+    def __init__(self, name, description=None, meta_data=None, status='ACTIVE', criteria=None, health='GREEN', id=None,
                  project_id=project_id):
         self.name = name
         self.description = description
-        self.data = data
+        self.meta_data = meta_data
         self.status = status
         self.criteria = criteria
         self.health = health
@@ -59,10 +62,36 @@ class Canary(db.Model):
         return {
             'name': self.name,
             'description': self.description,
-            'data': self.data,
+            'meta_data': self.meta_data,
             'status': self.status,
             'criteria': self.criteria,
             'health': self.health,
             'id': self.id
 
         }
+
+class CanaryResults(db.Model):
+    __tablename__ = 'canary_results'
+    id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    status = db.Column('status', db.String(256))
+    failure_details = db.Column('failure_details', db.String(256))
+    created_at = db.Column('created_at', db.DateTime())
+    canary_id = db.Column(db.Integer, db.ForeignKey('canaries.id'))
+
+    def __init__(self, status=status, failure_details=None, id=None,
+                 canary_id=canary_id):
+        self.status = status
+        self.failure_details = failure_details
+        self.created_at = datetime.utcnow()
+        self.id = id
+        self.canary_id = canary_id
+
+    def results_to_json(self):
+        return {
+            'status': self.status,
+            'failure_details': self.failure_details,
+            'created_at': self.created_at,
+            'id': self.id
+
+        }
+
