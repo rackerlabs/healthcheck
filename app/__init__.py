@@ -9,6 +9,10 @@ import models
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
+
+    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+    app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
     config[config_name].init_app(app)
 
     db.init_app(app)

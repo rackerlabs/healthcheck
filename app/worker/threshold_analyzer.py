@@ -13,8 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from base_analyzer import BaseAnalyzer
-from clients.api_client import APIClient
+from ..worker.base_analyzer import BaseAnalyzer
+from ..worker.clients.api_client import APIClient
 
 
 class ThresholdAnalyzer(BaseAnalyzer):
@@ -26,8 +26,8 @@ class ThresholdAnalyzer(BaseAnalyzer):
         # return True if green, false if red
         pass
 
-    #@celery.task, basically this is what's called async by the API
     def process_canary(self, canary_id):
+        print canary_id
         # Get canary (to get criteria)
         # Get all results of the canary (future -- get only sample size worth)
         # Call analyze_results: compare results to criteria

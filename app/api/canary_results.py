@@ -3,7 +3,7 @@ from .. import db
 from ..models import Projects, Canary, CanaryResults
 from . import api
 from .errors import bad_request
-
+from app.worker.tasks import process_canary
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results', methods=['POST'])
 def new_result(canary_id, project_id):
@@ -14,6 +14,7 @@ def new_result(canary_id, project_id):
     db.session.commit()
     post_response = jsonify(**new_result.results_to_json())
     post_response.status_code = 201
+    process_canary.delay(canary_id=canary_id)
     return post_response
 
 
