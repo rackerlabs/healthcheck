@@ -1,4 +1,5 @@
 from flask import jsonify, request, url_for
+from sqlalchemy import and_
 from .. import db
 from ..models import Projects, Canary
 from . import api
@@ -7,15 +8,14 @@ from .errors import bad_request
 
 @api.route('/projects/<int:project_id>/canary', methods=['POST'])
 def new_canary(project_id):
-    if request.method == 'POST':
-        post_request = request.get_json()
-        post_request['project_id'] = project_id
-        new_canary = Canary(**post_request)
-        db.session.add(new_canary)
-        db.session.commit()
-        post_response = jsonify(**new_canary.canary_to_json())
-        post_response.status_code = 201
-        return post_response
+    post_request = request.get_json()
+    post_request['project_id'] = project_id
+    new_canary = Canary(**post_request)
+    db.session.add(new_canary)
+    db.session.commit()
+    post_response = jsonify(**new_canary.canary_to_json())
+    post_response.status_code = 201
+    return post_response
 
 
 @api.route('/projects/<int:project_id>/canary', methods=['GET'])
@@ -47,7 +47,7 @@ def edit_canary(project_id, canary_id):
     data = request.get_json()
     canary.name = data.get('name') or canary.name
     canary.description = data.get('description') or canary.description
-    canary.data = data.get('data') or canary.data
+    canary.data = data.get('meta_data') or canary.meta_data
     canary.criteria = data.get('criteria') or canary.criteria
     db.session.commit()
     put_response = jsonify(**canary.canary_to_json())
@@ -63,6 +63,8 @@ def delete_canary(canary_id, project_id):
     name = canary.name
     if canary.status == "DISABLED":
         db.session.delete(canary)
+        # canary_results = CanaryResults.query.filter_by(canary_id=canary_id).all()
+        # db.session.delete()
         db.session.commit()
         response = jsonify("Deleted canary '%s' " % name)
         response.status_code = 200
@@ -72,3 +74,4 @@ def delete_canary(canary_id, project_id):
     response = jsonify("Disabled canary '%s' " % name)
     response.status_code = 204
     return response
+# ARCHIVE ALL ITS RESULTS?

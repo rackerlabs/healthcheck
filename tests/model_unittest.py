@@ -10,8 +10,7 @@ class ModelsTest(unittest.TestCase):
         json_project = project.to_json()
         expected = {"name": "new project", "email": "test@rackspace.com", "description": "A test project",
                     "dependencies": "projectA", "id": 1}
-        #print expected
-        #print json_project
         self.assertTrue(json_project == expected)
 
 
+# TEST canary_to_json() and get_canary()
