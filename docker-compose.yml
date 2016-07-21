@@ -1,0 +1,26 @@
+canary:
+  restart: always
+  build: ./canary
+  expose:
+    - "5000"
+  links:
+    - postgres:postgres
+  command: /canary/manage.py
+
+
+data:
+  restart: no
+  image: postgres:latest
+  volumes:
+    - /var/lib/postgresql
+  command: true
+
+
+postgres:
+  restart: always
+  image: postgres:latest
+  volumes_from:
+    - data
+  ports:
+    - "5432:5432"
+
