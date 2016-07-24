@@ -24,9 +24,9 @@ class DataClient(object):
         pass
 
     @abstractmethod
-    def update_canary(self, project_id, canary_id):
+    def update_canary(self, project_id, canary_id, new_health):
         pass
 
     @abstractmethod
-    def get_results(self, project_id, canary_id):
+    def get_results(self, project_id, canary_id, sample_size):
         pass

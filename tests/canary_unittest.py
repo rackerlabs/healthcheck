@@ -1,13 +1,11 @@
 import unittest
-from flask import jsonify
 import json
 from app import create_app, db
-
 
 data = {'name': 'test canary',
         'description': 'A test canary',
         'meta_data': {'region': 'Hong Kong', 'data2': 'tweete'},
-        'criteria': {'threshold': '90%'}
+        'criteria': {'threshold': '90%', 'expected_run_frequency': '5hrs', 'result_sample_size': '10'}
         }
 
 project_data = {'name': 'test project',
@@ -20,7 +18,7 @@ expected_data = {'name': 'test canary',
                  'meta_data': {'region': 'Hong Kong', 'data2': 'tweete'},
                  'status': 'ACTIVE',
                  'health': 'GREEN',
-                 'criteria': {'threshold': '90%'},
+                 'criteria': {'threshold': '90%', 'expected_run_frequency': '5hrs', 'result_sample_size': '10'},
                  'id': 1
                  }
 
@@ -62,7 +60,8 @@ class CanaryTest(unittest.TestCase):
                 'description': forgery_py.lorem_ipsum.sentences(quantity=1, as_list=False),
                 'meta_data': json.dumps(
                     {"region": forgery_py.lorem_ipsum.word()}),
-                'criteria': json.dumps({"threshold": "90%"})}
+                'criteria': json.dumps(
+                    {'threshold': '90%', 'expected_run_frequency': '5hrs', 'result_sample_size': '10'})}
         return data
 
     def test_post_canary(self):
@@ -100,12 +99,14 @@ class CanaryTest(unittest.TestCase):
         fake_project = self.post_fake_project()
         self.assertEquals(fake_project.status_code, 201)
         self.post_fake_canary()
-        edit_response = self.client.put('api/projects/1/canary/1', data=json.dumps({'criteria': {'threshold': '100%'}}),
+        edit_response = self.client.put('api/projects/1/canary/1', data=json.dumps(
+            {'criteria': {'threshold': '100%', 'expected_run_frequency': '5hrs', 'result_sample_size': '10'}}),
                                         headers={'content-type': 'application/json'})
 
         self.assertEquals(edit_response.status_code, 200)
         response_data = json.loads(edit_response.data)
-        self.assertEquals(response_data.get('criteria'), {'threshold': '100%'},
+        self.assertEquals(response_data.get('criteria'),
+                          {'threshold': '100%', 'expected_run_frequency': '5hrs', 'result_sample_size': '10'},
                           "EXPECTED {}, GOT {}".format({'threshold': '100%'}, response_data.get('criteria')))
 
     def test_delete_canary(self):
@@ -113,7 +114,7 @@ class CanaryTest(unittest.TestCase):
         self.assertEquals(fake_project.status_code, 201)
         self.post_fake_canary()
         delete_canary = self.client.delete('api/projects/1/canary/1')
-        self.assertEquals(delete_canary.status_code, 204)   #disabled the canary
+        self.assertEquals(delete_canary.status_code, 200)  # disabled the canary
         get_canary = self.client.get('api/projects/1/canary/1', content_type='application/json')
         self.assertEquals(get_canary.status_code, 200)
         json_data = json.loads(get_canary.data)

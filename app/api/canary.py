@@ -1,7 +1,6 @@
-from flask import jsonify, request, url_for
-from sqlalchemy import and_
+from flask import jsonify, request
 from .. import db
-from ..models import Projects, Canary
+from ..models import Canary, Results
 from . import api
 from .errors import bad_request
 
@@ -47,12 +46,26 @@ def edit_canary(project_id, canary_id):
     data = request.get_json()
     canary.name = data.get('name') or canary.name
     canary.description = data.get('description') or canary.description
-    canary.data = data.get('meta_data') or canary.meta_data
+    canary.meta_data = data.get('meta_data') or canary.meta_data
     canary.criteria = data.get('criteria') or canary.criteria
     db.session.commit()
     put_response = jsonify(**canary.canary_to_json())
     put_response.status_code = 200
     return put_response
+
+
+# should be able to merge this with the original PUT API
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>/health', methods=['PUT'])
+def edit_canary_health(project_id, canary_id):
+    canary = Canary.query.get(canary_id)
+    if canary is None or canary.project_id != project_id:
+        return bad_request('canary not found')
+    data = request.get_json()
+    canary.health = data.get('health')
+    db.session.commit()
+    response = jsonify("canary health updated")
+    response.status_code = 200
+    return response
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>', methods=['DELETE'])
@@ -63,15 +76,13 @@ def delete_canary(canary_id, project_id):
     name = canary.name
     if canary.status == "DISABLED":
         db.session.delete(canary)
-        # canary_results = CanaryResults.query.filter_by(canary_id=canary_id).all()
-        # db.session.delete()
+        canary_results = Results.query.filter_by(canary_id=canary_id).all()
+        for result in canary_results:
+            db.session.delete(result)
         db.session.commit()
-        response = jsonify("Deleted canary '%s' " % name)
-        response.status_code = 200
-        return response
+        return '', 204
     canary.status = "DISABLED"
     db.session.commit()
-    response = jsonify("Disabled canary '%s' " % name)
-    response.status_code = 204
+    response = jsonify("Disabled '%s' " % name)
+    response.status_code = 200
     return response
-# ARCHIVE ALL ITS RESULTS?
