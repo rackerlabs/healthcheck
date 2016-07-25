@@ -12,5 +12,3 @@ class ModelsTest(unittest.TestCase):
                     "dependencies": "projectA", "id": 1}
         self.assertTrue(json_project == expected)
 
-
-# TEST canary_to_json() and get_canary()
