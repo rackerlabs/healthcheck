@@ -9,6 +9,7 @@ class Config:
     SQLALCHEMY_RECORD_QUERIES = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
+
     @staticmethod
     def init_app(app):
         pass
@@ -56,7 +57,6 @@ config = {
     'testing': TestingConfig,
     'production': ProductionConfig,
     'unix': UnixConfig,
-
     'default': DevelopmentConfig
 }
 

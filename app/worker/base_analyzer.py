@@ -20,5 +20,5 @@ class BaseAnalyzer(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def process_canary(self, canary_id):
+    def process_canary(self, project_id, canary_id):
         pass

@@ -1,26 +1,31 @@
-from flask import jsonify, request, url_for
+from flask import jsonify, request
 from .. import db
-from ..models import Projects, Canary, CanaryResults
+from ..models import Results
 from . import api
 from .errors import bad_request
 from app.worker.tasks import process_canary
 
+
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results', methods=['POST'])
-def new_result(canary_id, project_id):
+def post_result(canary_id, project_id):
     post_request = request.get_json()
     post_request['canary_id'] = canary_id
-    new_result = CanaryResults(**post_request)
+    new_result = Results(**post_request)
     db.session.add(new_result)
     db.session.commit()
     post_response = jsonify(**new_result.results_to_json())
     post_response.status_code = 201
-    process_canary.delay(canary_id=canary_id)
+    process_canary.delay(project_id=project_id, canary_id=canary_id)
     return post_response
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results', methods=['GET'])
 def get_results(project_id, canary_id):
-    all_results = CanaryResults.query.filter_by(canary_id=canary_id)
+    limit = request.args.get('limit')
+    if limit:
+        all_results = Results.query.filter_by(canary_id=canary_id).order_by(Results.created_at.desc()).limit(limit)
+    else:
+        all_results = Results.query.filter_by(canary_id=canary_id)
     result_list = []
     for obj in all_results:
         result_list.append(obj.results_to_json())
@@ -31,7 +36,7 @@ def get_results(project_id, canary_id):
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results/<int:result_id>', methods=['GET'])
 def get_result(project_id, canary_id, result_id):
-    result = CanaryResults.query.get(result_id)
+    result = Results.query.get(result_id)
     if result is None or result.canary_id != canary_id:
         return bad_request('result not found')
     get_response = jsonify(**result.results_to_json())
@@ -41,7 +46,7 @@ def get_result(project_id, canary_id, result_id):
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results/<int:result_id>', methods=['PUT'])
 def edit_result(project_id, canary_id, result_id):
-    result = CanaryResults.query.get(result_id)
+    result = Results.query.get(result_id)
     if result is None or result.canary_id != canary_id:
         return bad_request('result not found')
     data = request.get_json()
@@ -55,13 +60,9 @@ def edit_result(project_id, canary_id, result_id):
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results/<int:result_id>', methods=['DELETE'])
 def delete_result(project_id, canary_id, result_id):
-    result = CanaryResults.query.get(result_id)
+    result = Results.query.get(result_id)
     if result is None or result.canary_id != canary_id:
         return bad_request('result not found')
     db.session.delete(result)
     db.session.commit()
     return '', 204
-
-
-# Archive results on delete if canary is disabled
-# use route without project_id or use project_id in code
