@@ -16,7 +16,7 @@ limitations under the License.
 from celery import Celery
 from threshold_analyzer import ThresholdAnalyzer
 
-worker_app = Celery("canary_analyzer", broker="redis://192.168.99.101:6379/0",
+worker_app = Celery("canary_analyzer", broker="redis://192.168.99.100:6379/0",
                     include=["app.worker.tasks"])
 
 analyzer = ThresholdAnalyzer()

@@ -21,19 +21,11 @@ def post_result(canary_id, project_id):
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results', methods=['GET'])
 def get_results(project_id, canary_id):
-    all_results = Results.query.filter_by(canary_id=canary_id)
-    result_list = []
-    for obj in all_results:
-        result_list.append(obj.results_to_json())
-    get_response = jsonify(results=result_list)
-    get_response.status_code = 200
-    return get_response
-
-
-#  use pagination?? FIND A way to merge this with GET???
-@api.route('/projects/<int:project_id>/canary/<int:canary_id>/results/limited/<limit>', methods=['GET'])
-def get_limited_results(project_id, canary_id, limit):
-    all_results = Results.query.filter_by(canary_id=canary_id).order_by(Results.created_at.desc()).limit(limit)
+    limit = request.args.get('limit')
+    if limit:
+        all_results = Results.query.filter_by(canary_id=canary_id).order_by(Results.created_at.desc()).limit(limit)
+    else:
+        all_results = Results.query.filter_by(canary_id=canary_id)
     result_list = []
     for obj in all_results:
         result_list.append(obj.results_to_json())
