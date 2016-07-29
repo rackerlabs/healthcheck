@@ -7,6 +7,12 @@ from app.worker.tasks import process_trend
 from celery import shared_task
 
 
+
+@api.route("/")
+def home_page():
+    return "CANARY PAGE"
+
+
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend', methods=['GET'])
 def get_trend(project_id, canary_id):
     results = [{u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 19:08:38 GMT', u'failure_details': u'', u'id': 1},
@@ -45,9 +51,14 @@ def get_trend(project_id, canary_id):
     interval = request.args.get('interval')
     resolution = request.args.get('resolution')
     threshold = request.args.get('threshold')
-    process_trend.delay(project_id=project_id, canary_id=canary_id, interval=interval, resolution=resolution,
+    values = process_trend.delay(project_id=project_id, canary_id=canary_id, interval=interval, resolution=resolution,
                         threshold=threshold, results=results)
-    return jsonify(msg="trending done")
+    graph_values = values.wait()
+    labels = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    print "GRAPH VALUES"
+    print graph_values
+    return render_template('chart.html', values=graph_values, labels=labels)
+
 
 
 @api.route('/projects/<int:project_id>/canary', methods=['POST'])
