@@ -35,8 +35,14 @@ class APIClient(DataClient):
                               headers={'content-type': 'application/json'})
         return update
 
-    def get_results(self, project_id, canary_id, sample_size):
-        canary_url = "{base_url}/api/projects/{project_id}/canary/{canary_id}/results?limit={sample_size}".format(
-            base_url=self.base_url, project_id=project_id, canary_id=canary_id, sample_size=sample_size)
-        canary_results = requests.get(canary_url)
+    def get_results(self, project_id, canary_id, sample_size, interval):
+        payload = {'limit' : sample_size, 'createdAt': interval}
+        canary_url = "{base_url}/api/projects/{project_id}/canary/{canary_id}/results".format(base_url=self.base_url,
+                                                                                                  project_id=project_id,
+                                                                                           canary_id=canary_id)
+        canary_results = requests.get(canary_url, params=payload)
+       # canary_url = "{base_url}/api/projects/{project_id}/canary/{canary_id}/results?limit={sample_size}".format(
+        #    base_url=self.base_url, project_id=project_id, canary_id=canary_id, sample_size=sample_size)
+       # canary_results = requests.get(canary_url)
         return canary_results.json()
+
