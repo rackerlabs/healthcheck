@@ -22,3 +22,6 @@ class BaseAnalyzer(object):
     @abstractmethod
     def process_canary(self, project_id, canary_id):
         pass
+
+    def process_day_trend(self, project_id, canary_id):
+        pass
