@@ -1,8 +1,53 @@
-from flask import jsonify, request
+from flask import jsonify, request, render_template
 from .. import db
 from ..models import Canary, Results
 from . import api
 from .errors import bad_request
+from app.worker.tasks import process_trend
+from celery import shared_task
+
+
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend', methods=['GET'])
+def get_trend(project_id, canary_id):
+    results = [{u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 19:08:38 GMT', u'failure_details': u'', u'id': 1},
+               {u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 19:38:38 GMT', u'failure_details': u'', u'id': 2},
+               {u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 20:09:38 GMT', u'failure_details': u'', u'id': 3},
+               {u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 20:48:38 GMT', u'failure_details': u'', u'id': 4},
+               {u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 21:10:38 GMT', u'failure_details': u'', u'id': 5},
+               {u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 21:50:38 GMT', u'failure_details': u'', u'id': 6},
+               {u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 22:09:38 GMT', u'failure_details': u'', u'id': 7},
+               {u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 22:38:38 GMT', u'failure_details': u'', u'id': 8},
+               {u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 23:09:38 GMT', u'failure_details': u'', u'id': 9},
+               {u'status': u'pass', u'created_at': u'Tue, 26 Jul 2016 23:40:38 GMT', u'failure_details': u'',
+                u'id': 10},
+               {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 00:09:38 GMT', u'failure_details': u'',
+                u'id': 11},
+               {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 00:15:38 GMT', u'failure_details': u'',
+                u'id': 12},
+               {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 01:09:38 GMT', u'failure_details': u'',
+                u'id': 13},
+               {u'status': u'fail', u'created_at': u'Tue, 27 Jul 2016 01:50:38 GMT', u'failure_details': u'',
+                u'id': 14},
+               {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 02:22:38 GMT', u'failure_details': u'',
+                u'id': 15},
+               {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 02:50:38 GMT', u'failure_details': u'',
+                u'id': 16},
+               {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 03:21:38 GMT', u'failure_details': u'',
+                u'id': 17},
+               {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 03:50:38 GMT', u'failure_details': u'',
+                u'id': 18},
+               {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 04:09:38 GMT', u'failure_details': u'',
+                u'id': 19},
+               {u'status': u'fail', u'created_at': u'Tue, 27 Jul 2016 04:20:38 GMT', u'failure_details': u'', u'id': 20}
+
+               ]
+
+    interval = request.args.get('interval')
+    resolution = request.args.get('resolution')
+    threshold = request.args.get('threshold')
+    process_trend.delay(project_id=project_id, canary_id=canary_id, interval=interval, resolution=resolution,
+                        threshold=threshold, results=results)
+    return jsonify(msg="trending done")
 
 
 @api.route('/projects/<int:project_id>/canary', methods=['POST'])
