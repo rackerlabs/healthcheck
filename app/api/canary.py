@@ -4,7 +4,7 @@ from ..models import Canary, Results
 from . import api
 from .errors import bad_request
 from app.worker.tasks import process_trend
-from celery import shared_task
+import pygal
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend', methods=['GET'])
@@ -45,9 +45,16 @@ def get_trend(project_id, canary_id):
     interval = request.args.get('interval')
     resolution = request.args.get('resolution')
     threshold = request.args.get('threshold')
-    process_trend.delay(project_id=project_id, canary_id=canary_id, interval=interval, resolution=resolution,
-                        threshold=threshold, results=results)
-    return jsonify(msg="trending done")
+    analysis_call = process_trend.delay(project_id=project_id, canary_id=canary_id, interval=interval,
+                                        resolution=resolution,
+                                        threshold=threshold, results=results)
+    results_list, values = analysis_call.wait()
+    line = pygal.Line()
+    line.title = "my awesome graph"
+    line.x_labels = values
+    line.add("status", [1 if x == "green"  else 0 for x in results_list])
+    return line.render()
+    # return jsonify(msg="trending done")
 
 
 @api.route('/projects/<int:project_id>/canary', methods=['POST'])

@@ -35,8 +35,11 @@ class TrendAnalyzer(BaseTrendAnalyzer):
             else:
                 analysis_list.append(results[index].get('status'))
                 status_list.append(self.trend_analyzer(threshold, analysis_list))
+        label = ["day1", "day2", "day3", "day4", "day5", "day6","day7","day8","day9", "day10"]
         print "STATUS LIST IS"
         print status_list
+        return status_list, label
+
 
 
     def trend_analyzer(self, threshold, results_list):
@@ -70,3 +73,6 @@ class TrendAnalyzer(BaseTrendAnalyzer):
             return timedelta(days=int(value[0]))
         elif value[1] == "hours":
             return timedelta(hours=int(value[0]))
+
+
+

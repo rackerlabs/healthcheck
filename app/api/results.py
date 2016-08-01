@@ -23,12 +23,11 @@ def post_result(canary_id, project_id):
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results', methods=['GET'])
 def get_results(project_id, canary_id):
     limit = request.args.get('limit')
-    createdAt = request.args.get('createdAt')
+    interval = request.args.get('interval')
     if limit:
         all_results = Results.query.filter_by(canary_id=canary_id).order_by(Results.created_at.desc()).limit(limit)
-    elif createdAt:
-        print "here"
-        query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - INTERVAL '{}'".format(createdAt))
+    elif interval:
+        query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - INTERVAL '{}'".format(interval))
         all_results = Results.query.filter(and_(Results.canary_id == canary_id, Results.created_at >= query_string))
     else:
         all_results = Results.query.filter_by(canary_id=canary_id)
