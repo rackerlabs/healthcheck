@@ -26,7 +26,7 @@ def get_trend(project_id, canary_id):
                 u'id': 12},
                {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 01:09:38 GMT', u'failure_details': u'',
                 u'id': 13},
-               {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 01:50:38 GMT', u'failure_details': u'',
+               {u'status': u'fail', u'created_at': u'Tue, 27 Jul 2016 01:50:38 GMT', u'failure_details': u'',
                 u'id': 14},
                {u'status': u'pass', u'created_at': u'Tue, 27 Jul 2016 02:22:38 GMT', u'failure_details': u'',
                 u'id': 15},

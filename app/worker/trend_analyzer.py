@@ -15,26 +15,29 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         status_list = []
         length = len(results)
         analysis_list = []
-        at_border = False
+        example_list = []
         start_time = datetime.strptime(results[0].get('created_at'), '%a, %d %b %Y %H:%M:%S %Z')
         border = start_time + resolution
-        for index in range(length):
+        index = 0
+        while index < length:
+            print results[index].get("id"), datetime.strptime(results[index].get('created_at'),
+                                                          '%a, %d %b %Y %H:%M:%S %Z')
             if index != length - 1:
-                print results[index].get("id"), datetime.strptime(results[index].get('created_at'),
-                                                                  '%a, %d %b %Y %H:%M:%S %Z')
-                if at_border:
-                    border = border + resolution
-                    at_border = False
                 if datetime.strptime(results[index].get('created_at'), '%a, %d %b %Y %H:%M:%S %Z') <= border:
                     analysis_list.append(results[index].get('status'))
+                    example_list.append(self.Example(results[index].get('status'), results[index].get('id')))
+                    index += 1
                 else:
-                    at_border = True
-                    status_list.append(self.trend_analyzer(threshold, analysis_list))
-                    analysis_list = []
-                    analysis_list.append(results[index].get('status'))
+                    print example_list
+                    if analysis_list:
+                        status_list.append(self.trend_analyzer(threshold, analysis_list))
+                        analysis_list = []
+                        example_list = []
+                    border = border + resolution
             else:
                 analysis_list.append(results[index].get('status'))
                 status_list.append(self.trend_analyzer(threshold, analysis_list))
+                break
         print "STATUS LIST IS"
         print status_list
 
@@ -70,3 +73,9 @@ class TrendAnalyzer(BaseTrendAnalyzer):
             return timedelta(days=int(value[0]))
         elif value[1] == "hours":
             return timedelta(hours=int(value[0]))
+
+
+
+
+
+
