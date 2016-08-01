@@ -4,6 +4,7 @@ from ..models import Results
 from . import api
 from .errors import bad_request
 from app.worker.tasks import process_canary
+from sqlalchemy import text, and_
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results', methods=['POST'])
@@ -22,8 +23,12 @@ def post_result(canary_id, project_id):
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results', methods=['GET'])
 def get_results(project_id, canary_id):
     limit = request.args.get('limit')
+    resolution = request.args.get('resolution')
     if limit:
         all_results = Results.query.filter_by(canary_id=canary_id).order_by(Results.created_at.desc()).limit(limit)
+    elif resolution:
+        query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - INTERVAL '{}'".format(resolution))
+        all_results = Results.query.filter(and_(Results.canary_id == canary_id, Results.created_at >= query_string))
     else:
         all_results = Results.query.filter_by(canary_id=canary_id)
     result_list = []

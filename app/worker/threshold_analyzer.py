@@ -48,10 +48,30 @@ class ThresholdAnalyzer(BaseAnalyzer):
         result_list = canary_results.get('results')
         green_health = self.analyze_results(criteria=canary_criteria, results=result_list)
         if not green_health and current_health == "GREEN":
-                # change health to red if not already red
-                update = self.api_client.update_canary(project_id=project_id, canary_id=canary_id, health="RED")
-                assert update.status_code == 200
+            # change health to red if not already red
+            update = self.api_client.update_canary(project_id=project_id, canary_id=canary_id, health="RED")
+            assert update.status_code == 200
         elif green_health and current_health == "RED":
-                # change health to green
-                update = self.api_client.update_canary(project_id=project_id, canary_id=canary_id, health="GREEN")
-                assert update.status_code == 200
+            # change health to green
+            update = self.api_client.update_canary(project_id=project_id, canary_id=canary_id, health="GREEN")
+            assert update.status_code == 200
+
+    # This will be called at every resolution
+    def process_time_trend(self, project_id, canary_id):  # time could be in hours, or day
+        canary = self.api_client.get_canary(project_id, canary_id)
+        current_health = canary.get('health')
+        criteria = canary.get('criteria')
+        sample_size = criteria.get('result_sample_size')
+        resolution = criteria.get('resolution').get
+        canary_results = self.api_client.get_results(project_id=project_id, canary_id=canary_id, sample_size=None,
+                                                     resolution=resolution)
+        result_list = canary_results.get('results')
+        green_health = self.analyze_results(criteria=criteria, results=result_list)
+        if not green_health and current_health == "GREEN":
+            # change health to red if not already red
+            update = self.api_client.update_canary(project_id=project_id, canary_id=canary_id, health="RED")
+            assert update.status_code == 200
+        elif green_health and current_health == "RED":
+            # change health to green
+            update = self.api_client.update_canary(project_id=project_id, canary_id=canary_id, health="GREEN")
+            assert update.status_code == 200
