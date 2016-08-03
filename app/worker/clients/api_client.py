@@ -15,6 +15,7 @@ limitations under the License.
 """
 from data_client import DataClient
 import requests, json
+from datetime import datetime
 
 
 class APIClient(DataClient):
@@ -41,4 +42,15 @@ class APIClient(DataClient):
                                                                                            canary_id=canary_id)
         canary_results = requests.get(canary_url, params=payload)
         return canary_results.json()
+
+
+    def post_results(self, project_id, canary_id, data):
+        canary_url = '{base_url}/api/projects/{project_id}/canary/{canary_id}/results'.format(
+            base_url=self.base_url, project_id=project_id, canary_id=canary_id)
+        result_post = requests.post(canary_url, data=json.dumps(data),
+                                headers={'content-type': 'application/json'})
+        return result_post
+
+
+
 

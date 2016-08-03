@@ -79,11 +79,11 @@ class Results(db.Model):
     created_at = db.Column('created_at', db.DateTime())
     canary_id = db.Column(db.Integer, db.ForeignKey('canaries.id'))
 
-    def __init__(self, status=status, failure_details=None, id=None,
+    def __init__(self, status=status, created_at=None, failure_details=None, id=None,
                  canary_id=canary_id):
         self.status = status
         self.failure_details = failure_details
-        self.created_at = datetime.utcnow()
+        self.created_at = created_at or datetime.utcnow()
         self.id = id
         self.canary_id = canary_id
 
@@ -95,4 +95,7 @@ class Results(db.Model):
             'id': self.id
 
         }
+
+
+
 
