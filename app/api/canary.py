@@ -30,8 +30,12 @@ def get_trend(project_id, canary_id):
 
 
     results_list, values = analysis_call.wait()
-    print results_list, values
-    return jsonify(msg="Trending in progress.")
+    labels = format_datetime(values=values, resolution=resolution)
+    line = pygal.Line()
+    line.title = "Canary Trend over {interval}".format(interval= interval)
+    line.x_labels = labels
+    line.add("status", [1 if x == "green" else 0 for x in results_list])
+    return line.render()
 
 def format_datetime(values, resolution):
     value = resolution.split()
@@ -42,7 +46,8 @@ def format_datetime(values, resolution):
         return format_values
     elif value[1] == "hours":
         for timee in values:
-            n_time = datetime.strptime(timee, '%Y-%m-%d %H')
+            timee = str.join(' ', timee.split('.')[0:1])
+            n_time = datetime.strptime(timee, '%Y-%m-%d %H:%M:%S')
             format_values.append(n_time)
         return format_values
 
