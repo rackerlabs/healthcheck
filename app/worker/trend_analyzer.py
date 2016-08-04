@@ -4,59 +4,60 @@ from ..worker.clients.api_client import APIClient
 from datetime import datetime, timedelta
 from .result_test import ResultGen
 
-gen = ResultGen()
 
 class TrendAnalyzer(BaseTrendAnalyzer):
     def __init__(self):
         self.api_client = APIClient(base_url="http://localhost:5000")
 
-# Always clear your table after each call to trend
-    def process_trend(self, project_id, canary_id, interval, resolution, threshold):
-        gen.generate_test_results(project_id=project_id, canary_id=canary_id, interval=interval,count=10)
-        results = self.api_client.get_results(project_id=project_id, canary_id=canary_id, interval=interval, sample_size=None)
-        results_list = sorted(results.get('results'))
+    def process_trend(self, resolution, threshold, results_list):
+        results_list = sorted(results_list)
         resolution = self.time_conversion(resolution)
         status_list = []
         length = len(results_list)
         analysis_list = []
-        start_time = datetime.strptime(results_list[0].get('created_at'), '%a, %d %b %Y %H:%M:%S %Z')
+        start_time = datetime.strptime(results_list[0].get('created_at'), '%Y-%m-%d %H:%M:%S.%f')
         border = start_time + resolution
         index = 0
+        labels = []
         while index < length:
             if index != length - 1:
-                created_at = datetime.strptime(results_list[index].get('created_at'), '%a, %d %b %Y %H:%M:%S %Z')
+                created_at = datetime.strptime(results_list[index].get('created_at'), '%Y-%m-%d %H:%M:%S.%f')
                 if created_at <= border:
                     analysis_list.append(results_list[index].get('status'))
                     index += 1
                 else:
                     # at a border
                     if analysis_list:
+                        labels.append("{}".format(border - resolution))
                         status_list.append(self.trend_analyzer(threshold, analysis_list))
                         analysis_list = []
                     border = border + resolution
             else:
                 # looking at the last result
-                created_at = datetime.strptime(results_list[index].get('created_at'), '%a, %d %b %Y %H:%M:%S %Z')
+                created_at = datetime.strptime(results_list[index].get('created_at'), '%Y-%m-%d %H:%M:%S.%f')
                 if created_at <= border: # if last result is in the same time resolution as the previous
+                    labels.append("{}".format(border - resolution))
                     analysis_list.append(results_list[index].get('status'))
                     status_list.append(self.trend_analyzer(threshold, analysis_list))
                 else:
-                    # analyse what you currently have and start over
+                    # analyse what you currently have and try to get the last result in the right time frame
+                    labels.append("{}".format(border - resolution))
                     status_list.append(self.trend_analyzer(threshold, analysis_list))
                     analysis_list = []
                     border = border + resolution
                     while True:
                         if created_at <= border:
+                            labels.append("{}".format(border - resolution))
                             analysis_list.append(results_list[index].get('status'))
                             status_list.append(self.trend_analyzer(threshold, analysis_list))
                             break
                         else:
                             border = border + resolution
                 index += 1
-        label = ["day1", "day2", "day3", "day4", "day5", "day6", "day7", "day8", "day9", "day10"]
         print "STATUS LIST IS"
         print status_list
-        return status_list, label
+        print "LABELS IS " ,labels
+        return status_list, labels
 
 
     def trend_analyzer(self, threshold, results_list):

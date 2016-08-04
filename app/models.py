@@ -91,7 +91,7 @@ class Results(db.Model):
         return {
             'status': self.status,
             'failure_details': self.failure_details,
-            'created_at': self.created_at,
+            'created_at': "{}".format(self.created_at),
             'id': self.id
 
         }

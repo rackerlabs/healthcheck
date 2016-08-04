@@ -1,12 +1,8 @@
-from app import db
-from sqlalchemy.exc import IntegrityError
 from random import seed, randint
-from ..worker.clients.api_client import APIClient
+from app.worker.clients.api_client import APIClient
 import forgery_py
 from datetime import datetime, timedelta
 import radar
-from app.models import Results
-
 
 
 class ResultGen:
@@ -29,9 +25,9 @@ class ResultGen:
 
 
     def generate_test_results(self,project_id, canary_id, interval, count):
-        all_results = []
         seed()
         end_time = datetime.utcnow()
+        print "GENERATING"
         for index in range(count):
             code = randint(0, 1)
             if code is 0:
@@ -42,13 +38,16 @@ class ResultGen:
                 status = "fail"
                 failure_details = forgery_py.lorem_ipsum.title(words_quantity=2)
                 created_at = self.generate_time(interval=interval, current=end_time)
+
             data = {'status' : status,
                     'failure_details' : failure_details,
-                    'created_at' : "{}".format(created_at),
-                    'id': index + 1
+                    'created_at' : "{}".format(created_at)
             }
             call = self.api_client.post_results(project_id, canary_id, data)
             if call.status_code != 201:
                 print "ERROR WHILE GENERATING RESULTS"
 
 
+if __name__ == "__main__":
+    gen = ResultGen()
+    gen.generate_test_results(project_id=2, canary_id=4, interval="1 days", count=10)

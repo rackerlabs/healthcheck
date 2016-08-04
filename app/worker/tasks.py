@@ -23,8 +23,8 @@ worker_app = Celery("canary_analyzer", broker="redis://192.168.99.100:6379/0",
                     backend="redis://192.168.99.100:6379/0",
                     include=["app.worker.tasks"])
 
-#analyzer = SampleSizeAnalyzer()
-analyzer = ResolutionAnalyzer()
+analyzer = SampleSizeAnalyzer()
+# analyzer = ResolutionAnalyzer()
 trend = TrendAnalyzer()
 
 
@@ -35,9 +35,9 @@ def process_canary(canary_id, project_id):
 
 
 @worker_app.task
-def process_trend(project_id, canary_id, interval, resolution, threshold):
-    return trend.process_trend(project_id=project_id, canary_id=canary_id, interval=interval, resolution=resolution,
-                           threshold=threshold)
+def process_trend(resolution, threshold, results_list):
+    return trend.process_trend(resolution=resolution,
+                           threshold=threshold, results_list= results_list)
 
 
 
