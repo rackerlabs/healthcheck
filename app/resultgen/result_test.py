@@ -27,7 +27,6 @@ class ResultGen:
     def generate_test_results(self, project_id, canary_id, interval, count):
         seed()
         end_time = datetime.utcnow()
-        print "GENERATING"
         for index in range(count):
             code = randint(0, 1)
             if code is 0:
@@ -48,7 +47,6 @@ class ResultGen:
                 print "ERROR WHILE GENERATING RESULTS"
 
 
-
 if __name__ == "__main__":
     gen = ResultGen()
     parser = argparse.ArgumentParser()
@@ -56,7 +54,7 @@ if __name__ == "__main__":
     parser.add_argument('canary_id', type=int, help='The canary_id')
     parser.add_argument('interval', type=str, help='The time frame for results set')
     parser.add_argument('count', type=int, help='The number of results you want generated for this period')
-    args= parser.parse_args()
+    args = parser.parse_args()
     project_id = args.project_id
     canary_id = args.canary_id
     interval = args.interval
