@@ -16,7 +16,7 @@ def post_result(canary_id, project_id):
     db.session.commit()
     post_response = jsonify(**new_result.results_to_json())
     post_response.status_code = 201
-    # process_canary.delay(project_id=project_id, canary_id=canary_id)
+    process_canary.delay(project_id=project_id, canary_id=canary_id)
     return post_response
 
 
@@ -71,4 +71,3 @@ def delete_result(project_id, canary_id, result_id):
     db.session.delete(result)
     db.session.commit()
     return '', 204
-

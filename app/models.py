@@ -46,7 +46,6 @@ class Canary(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
     results = db.relationship('Results', backref='canary', lazy='dynamic')
 
-
     def __init__(self, name, description=None, meta_data=None, status='ACTIVE', criteria=None, health='GREEN', id=None,
                  project_id=project_id):
         self.name = name
@@ -70,6 +69,7 @@ class Canary(db.Model):
             'id': self.id
 
         }
+
 
 class Results(db.Model):
     __tablename__ = 'results'
@@ -95,7 +95,3 @@ class Results(db.Model):
             'id': self.id
 
         }
-
-
-
-
