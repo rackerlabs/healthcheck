@@ -56,7 +56,6 @@ class Canary(db.Model):
         self.health = health
         self.id = id
         self.project_id = project_id
-        # trend?
 
     def canary_to_json(self):
         return {

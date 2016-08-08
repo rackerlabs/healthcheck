@@ -1,38 +1,52 @@
-# healthcheck
+##Health Check As A Service
+A service that provides health check and monitoring for a canary. Anything can be a canary.
 
-To run
+##To Run
+1.The service currently uses redis set up on a docker machine, port 192.168.99.100.(If necessary, adjust the port in the file)
 
-If a database is set up, run the manage.py file with,
-DEV_DATABASE_URL='postgresql://DB_username:DB_password@localhost:DB_port/DB_name' "  where DB_name is the
-name of the database.
-For instance: DEV_DATABASE_URL='postgresql://user234:password@localhost:5432/canaryDB' python manage.py
+2.Run "celery --app=app.worker.tasks worker" to spin up the celery worker.
 
-If there is no database set up, currently it will default to using
-"sqlite:///' + os.path.join(basedir, 'data-dev.sqlite)"
+3.Finally, run manage.py to start the app
 
+####Examples for project, canary and result
 
-Routes syntax is: http://127.0.0.1:5000/api/"resource_name"
-
-An example for a new project:
-
-  {
-                    "name" : "new",
+    Project
+                {
+                    "name" : "new project",
                     "email": "test@rackspace.com",
                     "description": "A canary service that will monitor, keep track, and trend of",
                     "dependencies" : "projectX"	            
-    }
+                 }
     
     
-An example to post a new canary:
-               {
-                    "name" : "canary1",
-                    "description": "OnMetal canary, tweet tweet",
-                    "data" : { 
-                        "region" : "Hong Kong"
+    Canary
+              {
+                    "name" : "new canary",
+                    "description": "Tests that API responds with correct status code for test cases",
+                    "meta_data": {  "region": "Austin"
                     },
-                    "criteria": {
-                        "cr1": "pass all tests",
-                        "short_trend" : "5 hours",
-                        "long_trend" : "3 days"
-                    }
+                    "criteria" : {
+                         "resolution" : "1 hours",
+			             "threshold" : 80,
+			             "result_sample_size": 10
+			         }
                 }
+                
+     Result
+                {
+                    "status" : "pass",
+                    "failure_details" : ""
+                    
+    
+      
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
