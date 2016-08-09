@@ -46,7 +46,6 @@ class Canary(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
     results = db.relationship('Results', backref='canary', lazy='dynamic')
 
-
     def __init__(self, name, description=None, meta_data=None, status='ACTIVE', criteria=None, health='GREEN', id=None,
                  project_id=project_id):
         self.name = name
@@ -57,7 +56,6 @@ class Canary(db.Model):
         self.health = health
         self.id = id
         self.project_id = project_id
-        # trend?
 
     def canary_to_json(self):
         return {
@@ -71,6 +69,7 @@ class Canary(db.Model):
 
         }
 
+
 class Results(db.Model):
     __tablename__ = 'results'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
@@ -79,11 +78,11 @@ class Results(db.Model):
     created_at = db.Column('created_at', db.DateTime())
     canary_id = db.Column(db.Integer, db.ForeignKey('canaries.id'))
 
-    def __init__(self, status=status, failure_details=None, id=None,
+    def __init__(self, status=status, created_at=None, failure_details=None, id=None,
                  canary_id=canary_id):
         self.status = status
         self.failure_details = failure_details
-        self.created_at = datetime.utcnow()
+        self.created_at = created_at or datetime.utcnow()
         self.id = id
         self.canary_id = canary_id
 
@@ -91,8 +90,7 @@ class Results(db.Model):
         return {
             'status': self.status,
             'failure_details': self.failure_details,
-            'created_at': self.created_at,
+            'created_at': "{}".format(self.created_at),
             'id': self.id
 
         }
-

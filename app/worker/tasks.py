@@ -14,14 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from celery import Celery
-from threshold_analyzer import ThresholdAnalyzer
+from sample_size_analyzer import SampleSizeAnalyzer
+from trend_analyzer import TrendAnalyzer
 
 worker_app = Celery("canary_analyzer", broker="redis://192.168.99.100:6379/0",
+                    backend="redis://192.168.99.100:6379/0",
                     include=["app.worker.tasks"])
 
-analyzer = ThresholdAnalyzer()
+analyzer = SampleSizeAnalyzer()
+trend = TrendAnalyzer()
 
 
 @worker_app.task
 def process_canary(canary_id, project_id):
     analyzer.process_canary(project_id=project_id, canary_id=canary_id)
+
+
+@worker_app.task
+def process_trend(resolution, threshold, results_list):
+    return trend.process_trend(resolution=resolution,
+                               threshold=threshold, results_list=results_list)

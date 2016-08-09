@@ -12,5 +12,3 @@ def page_not_found(request):
         response = jsonify({'error': 'not found'})
         response.status_code = 404
         return response
-
-
