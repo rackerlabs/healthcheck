@@ -1,4 +1,4 @@
-from flask import jsonify, request, render_template
+from flask import jsonify, request
 from .. import db
 from ..models import Canary, Results
 from . import api
