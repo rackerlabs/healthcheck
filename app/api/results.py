@@ -22,7 +22,7 @@ def post_result(canary_id, project_id):
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results', methods=['GET'])
 def get_results(project_id, canary_id):
-    limit = request.args.get('limit')
+    limit = request.args.get('sample_size')
     interval = request.args.get('interval')
     if limit:
         all_results = Results.query.filter_by(canary_id=canary_id).order_by(Results.created_at.desc()).limit(limit)

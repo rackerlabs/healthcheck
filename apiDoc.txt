@@ -163,7 +163,7 @@ The graph will plot only data and dates that are available, it is up to you to k
                 "meta_data": {"region" : "Austin"},
                 "status": "ACTIVE",
                 "criteria": {
-                             "expected_run_frequency" : "5hrs",
+                             "expected_run_frequency" : "5hrs",  TAKE THIS OUT
                              "resolution" : "1 hours",
                              "threshold" : 80,
                              "result_sample_size": 10
