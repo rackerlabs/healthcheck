@@ -17,8 +17,8 @@ from celery import Celery
 from sample_size_analyzer import SampleSizeAnalyzer
 from trend_analyzer import TrendAnalyzer
 
-worker_app = Celery("canary_analyzer", broker="redis://192.168.99.100:6379/0",
-                    backend="redis://192.168.99.100:6379/0",
+worker_app = Celery("canary_analyzer", broker="redis://queue:6379/0",
+                    backend="redis://queue:6379/0",
                     include=["app.worker.tasks"])
 
 analyzer = SampleSizeAnalyzer()
