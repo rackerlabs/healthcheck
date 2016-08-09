@@ -10,11 +10,6 @@ class TrendAnalyzer(BaseTrendAnalyzer):
 
     def process_trend(self, resolution, threshold, results_list):
         results_list = sorted(results_list)
-
-        for result in results_list:
-            print result
-            print '\n'
-
         resolution = self.time_conversion(resolution)
         status_list = []
         length = len(results_list)
@@ -23,43 +18,33 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         border = start_time + resolution
         index = 0
         labels = []
-        example_list = []
         while index < length:
             if index != length - 1:
                 created_at = datetime.strptime(results_list[index].get('created_at'), '%Y-%m-%d %H:%M:%S.%f')
                 if created_at <= border:
-                    example_list.append(Example(results_list[index].get('status'), results_list[index].get('id')))
                     analysis_list.append(results_list[index].get('status'))
                     index += 1
                 else:
                     if analysis_list:
                         labels.append("{}".format(border - resolution))
-                        print "EXAMPLE ", example_list
                         status_list.append(self.trend_analyzer(threshold, analysis_list))
                         analysis_list = []
-                        example_list = []
                     border = border + resolution
             else:
                 created_at = datetime.strptime(results_list[index].get('created_at'), '%Y-%m-%d %H:%M:%S.%f')
                 if created_at <= border:
                     labels.append("{}".format(border - resolution))
-                    example_list.append(Example(results_list[index].get('status'), results_list[index].get('id')))
                     analysis_list.append(results_list[index].get('status'))
-                    print "EXAMPLE LIST" , example_list
                     status_list.append(self.trend_analyzer(threshold, analysis_list))
                 else:
                     labels.append("{}".format(border - resolution))
-                    print  "EXAMPLE LIST" , example_list
                     status_list.append(self.trend_analyzer(threshold, analysis_list))
                     analysis_list = []
-                    example_list = []
                     border = border + resolution
                     while True:
                         if created_at <= border:
                             labels.append("{}".format(border - resolution))
                             analysis_list.append(results_list[index].get('status'))
-                            example_list.append(Example(results_list[index].get('status'), results_list[index].get('id')))
-                            print "EXAMPLE LIST",  example_list
                             status_list.append(self.trend_analyzer(threshold, analysis_list))
                             break
                         else:
@@ -90,14 +75,3 @@ class TrendAnalyzer(BaseTrendAnalyzer):
             return timedelta(days=int(value[0]))
         elif value[1] == "hours":
             return timedelta(hours=int(value[0]))
-
-
-
-class Example():
-    def __init__(self, status, id):
-        self.status = status
-        self.id = id
-
-    def __repr__(self):
-        return "[id = %d, status = %s]" % (self.id, self.status)
-

@@ -22,7 +22,7 @@ class ResultGen:
             stop = current
             return radar.random_datetime(start, stop)
         else:
-            print "NO DELTA VALUE"
+            print "INVALID INTERVAL"
 
     def generate_test_results(self, project_id, canary_id, interval, count):
         seed()
