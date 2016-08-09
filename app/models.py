@@ -1,5 +1,5 @@
 from . import db
-from sqlalchemy.dialects.postgresql import *
+from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 
 

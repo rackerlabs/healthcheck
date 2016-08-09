@@ -2,13 +2,10 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config import config
 
-
 db = SQLAlchemy()
 
 
-import models
 def create_app(config_name=None):
-
     if config_name is None:
         config_name = 'default'
     app = Flask(__name__)
@@ -27,5 +24,3 @@ def create_app(config_name=None):
     app.register_blueprint(api_blueprint, url_prefix='/api')
 
     return app
-
-
