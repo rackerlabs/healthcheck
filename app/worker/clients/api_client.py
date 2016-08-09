@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from data_client import DataClient
-import requests, json
+import requests
+import json
 
 
 class APIClient(DataClient):
