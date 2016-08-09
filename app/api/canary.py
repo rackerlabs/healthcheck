@@ -6,13 +6,6 @@ from .errors import bad_request
 from sqlalchemy import and_, text
 from app.worker.tasks import process_trend
 import pygal
-from datetime import datetime
-
-
-@api.route('/projects/test')
-def home():
-    return jsonify(msg="CANARY TRENDING")
-
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend', methods=['GET'])
@@ -26,28 +19,27 @@ def get_trend(project_id, canary_id):
     for result in results:
         results_list.append(result.results_to_json())
     analysis_call = process_trend.delay(resolution=resolution,
-                                        threshold=threshold, results_list= results_list)
-
-
+                                        threshold=threshold, results_list=results_list)
     results_list, values = analysis_call.wait()
     labels = format_datetime(values=values, resolution=resolution)
     line = pygal.Line()
-    line.title = "Canary Trend over {interval}".format(interval= interval)
+    line.title = "Canary Trend over {interval}".format(interval=interval)
     line.x_labels = labels
     line.add("status", [1 if x == "green" else 0 for x in results_list])
     return line.render()
+
 
 def format_datetime(values, resolution):
     value = resolution.split()
     format_values = []
     if value[1] == "days":
         for timee in values:
-            format_values.append(datetime.strptime(timee, '%Y-%m-%d'))
+            n_time = timee[5:16]
+            format_values.append(n_time)
         return format_values
     elif value[1] == "hours":
         for timee in values:
-            timee = str.join(' ', timee.split('.')[0:1])
-            n_time = datetime.strptime(timee, '%Y-%m-%d %H:%M:%S')
+            n_time = timee[5:16]
             format_values.append(n_time)
         return format_values
 

@@ -15,18 +15,14 @@ limitations under the License.
 """
 from celery import Celery
 from sample_size_analyzer import SampleSizeAnalyzer
-from resolution_analyzer import ResolutionAnalyzer
 from trend_analyzer import TrendAnalyzer
-from datetime import timedelta
 
 worker_app = Celery("canary_analyzer", broker="redis://192.168.99.100:6379/0",
                     backend="redis://192.168.99.100:6379/0",
                     include=["app.worker.tasks"])
 
 analyzer = SampleSizeAnalyzer()
-# analyzer = ResolutionAnalyzer()
 trend = TrendAnalyzer()
-
 
 
 @worker_app.task
@@ -37,7 +33,4 @@ def process_canary(canary_id, project_id):
 @worker_app.task
 def process_trend(resolution, threshold, results_list):
     return trend.process_trend(resolution=resolution,
-                           threshold=threshold, results_list= results_list)
-
-
-
+                               threshold=threshold, results_list=results_list)

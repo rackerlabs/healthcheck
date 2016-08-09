@@ -37,21 +37,8 @@ class ThresholdAnalyzer(BaseAnalyzer):
         else:
             return False
 
-    def change_health(self, current_health, green_health, project_id, canary_id):
-        if not green_health and current_health == "GREEN":
-            update = self.api_client.update_canary(project_id=project_id, canary_id=canary_id, health="RED")
-            assert update.status_code == 200
-        elif green_health and current_health == "RED":
-            update = self.api_client.update_canary(project_id=project_id, canary_id=canary_id, health="GREEN")
-            assert update.status_code == 200
-
     def get_canary_params(self, canary_id, project_id):
         canary = self.api_client.get_canary(project_id, canary_id)
         current_health = canary.get('health')
         criteria = canary.get('criteria')
         return current_health, criteria
-
-    def get_results(self, canary_id, project_id, sample_size, interval):
-        canary_results = self.api_client.get_results(project_id=project_id, canary_id=canary_id,
-                                                     sample_size=sample_size, interval=interval)
-        return canary_results.get('results')

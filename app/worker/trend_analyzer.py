@@ -1,8 +1,7 @@
 from __future__ import division
+from datetime import datetime, timedelta
 from ..worker.base_trend_analyzer import BaseTrendAnalyzer
 from ..worker.clients.api_client import APIClient
-from datetime import datetime, timedelta
-from .result_test import ResultGen
 
 
 class TrendAnalyzer(BaseTrendAnalyzer):
@@ -26,21 +25,18 @@ class TrendAnalyzer(BaseTrendAnalyzer):
                     analysis_list.append(results_list[index].get('status'))
                     index += 1
                 else:
-                    # at a border
                     if analysis_list:
                         labels.append("{}".format(border - resolution))
                         status_list.append(self.trend_analyzer(threshold, analysis_list))
                         analysis_list = []
                     border = border + resolution
             else:
-                # looking at the last result
                 created_at = datetime.strptime(results_list[index].get('created_at'), '%Y-%m-%d %H:%M:%S.%f')
-                if created_at <= border: # if last result is in the same time resolution as the previous
+                if created_at <= border:
                     labels.append("{}".format(border - resolution))
                     analysis_list.append(results_list[index].get('status'))
                     status_list.append(self.trend_analyzer(threshold, analysis_list))
                 else:
-                    # analyse what you currently have and try to get the last result in the right time frame
                     labels.append("{}".format(border - resolution))
                     status_list.append(self.trend_analyzer(threshold, analysis_list))
                     analysis_list = []
@@ -54,11 +50,9 @@ class TrendAnalyzer(BaseTrendAnalyzer):
                         else:
                             border = border + resolution
                 index += 1
-        print "STATUS LIST IS"
-        print status_list
-        print "LABELS IS " ,labels
+        print "STATUS LIST IS", status_list
+        print "LABELS IS ", labels
         return status_list, labels
-
 
     def trend_analyzer(self, threshold, results_list):
         passes = 0
@@ -75,22 +69,9 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         else:
             return "red"
 
-
-    class Example():
-        def __init__(self, status, id):
-            self.status = status
-            self.id = id
-
-        def __repr__(self):
-            return "[id = %d, status = %s]" % (self.id, self.status)
-
-
     def time_conversion(self, time_value):
         value = time_value.split()
         if value[1] == "days":
             return timedelta(days=int(value[0]))
         elif value[1] == "hours":
             return timedelta(hours=int(value[0]))
-
-
-
