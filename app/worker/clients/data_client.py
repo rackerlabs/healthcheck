@@ -28,5 +28,9 @@ class DataClient(object):
         pass
 
     @abstractmethod
-    def get_results(self, project_id, canary_id, sample_size):
+    def get_results(self, project_id, canary_id, sample_size, interval):
+        pass
+
+    @abstractmethod
+    def post_results(self, project_id, canary_id, data):
         pass

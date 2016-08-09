@@ -21,3 +21,4 @@ six==1.4.1
 psycopg2==2.6.1
 celery==3.1.23
 redis==2.10.5
+pygal==2.2.3

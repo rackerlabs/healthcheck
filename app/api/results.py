@@ -3,6 +3,7 @@ from .. import db
 from ..models import Results
 from . import api
 from .errors import bad_request
+from sqlalchemy import and_, text
 from app.worker.tasks import process_canary
 
 
@@ -21,9 +22,13 @@ def post_result(canary_id, project_id):
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results', methods=['GET'])
 def get_results(project_id, canary_id):
-    limit = request.args.get('limit')
+    limit = request.args.get('sample_size')
+    interval = request.args.get('interval')
     if limit:
         all_results = Results.query.filter_by(canary_id=canary_id).order_by(Results.created_at.desc()).limit(limit)
+    elif interval:
+        query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - INTERVAL '{}'".format(interval))
+        all_results = Results.query.filter(and_(Results.canary_id == canary_id, Results.created_at >= query_string))
     else:
         all_results = Results.query.filter_by(canary_id=canary_id)
     result_list = []
