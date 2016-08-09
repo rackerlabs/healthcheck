@@ -6,7 +6,7 @@ A service that provides health check and monitoring for a canary. Anything can b
 
 2.Run "celery --app=app.worker.tasks worker" to spin up the celery worker.
 
-3.Finally, run manage.py to start the app
+3.Finally, run manage.py to start the app.
 
 ####Examples for project, canary and result
 
