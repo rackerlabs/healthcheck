@@ -8,18 +8,22 @@ from app.worker.tasks import process_trend
 import pygal
 
 
-@api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend', methods=['GET'])
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',
+           methods=['GET'])
 def get_trend(project_id, canary_id):
     interval = request.args.get('interval')
     resolution = request.args.get('resolution')
     threshold = request.args.get('threshold')
-    query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - INTERVAL '{}'".format(interval))
-    results = Results.query.filter(and_(Results.canary_id == canary_id, Results.created_at >= query_string))
+    query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - "
+                        "INTERVAL '{}'".format(interval))
+    results = Results.query.filter(and_(Results.canary_id == canary_id,
+                                        Results.created_at >= query_string))
     results_list = []
     for result in results:
         results_list.append(result.results_to_json())
     analysis_call = process_trend.delay(resolution=resolution,
-                                        threshold=threshold, results_list=results_list)
+                                        threshold=threshold,
+                                        results_list=results_list)
     results_list, values = analysis_call.wait()
     labels = format_datetime(values=values, resolution=resolution)
     line = pygal.Line()
@@ -58,7 +62,8 @@ def new_canary(project_id):
 
 @api.route('/projects/<int:project_id>/canary', methods=['GET'])
 def get_canaries(project_id):
-    all_canaries = Canary.query.filter_by(project_id=project_id).filter_by(status="ACTIVE")
+    all_canaries = Canary.query.filter_by(project_id=project_id). \
+        filter_by(status="ACTIVE")
     canary_list = []
     for obj in all_canaries:
         canary_list.append(obj.canary_to_json())
@@ -67,7 +72,8 @@ def get_canaries(project_id):
     return get_response
 
 
-@api.route('/projects/<int:project_id>/canary/<int:canary_id>', methods=['GET'])
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>',
+           methods=['GET'])
 def get_canary(project_id, canary_id):
     canary = Canary.query.get(canary_id)
     if canary is None or canary.project_id != project_id:
@@ -77,7 +83,8 @@ def get_canary(project_id, canary_id):
     return get_response
 
 
-@api.route('/projects/<int:project_id>/canary/<int:canary_id>', methods=['PUT'])
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>',
+           methods=['PUT'])
 def edit_canary(project_id, canary_id):
     canary = Canary.query.get(canary_id)
     if canary is None or canary.project_id != project_id:
@@ -94,7 +101,8 @@ def edit_canary(project_id, canary_id):
     return put_response
 
 
-@api.route('/projects/<int:project_id>/canary/<int:canary_id>', methods=['DELETE'])
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>',
+           methods=['DELETE'])
 def delete_canary(canary_id, project_id):
     canary = Canary.query.get(canary_id)
     if canary is None or canary.project_id != project_id:

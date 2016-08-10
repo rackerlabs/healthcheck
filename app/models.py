@@ -12,7 +12,8 @@ class Projects(db.Model):
     dependencies = db.Column('dependencies', db.String(256))
     canaries = db.relationship('Canary', backref='project', lazy='dynamic')
 
-    def __init__(self, name, email, description=None, dependencies=None, id=None):
+    def __init__(self, name, email, description=None,
+                 dependencies=None, id=None):
         self.name = name
         self.email = email
         self.description = description
@@ -20,9 +21,9 @@ class Projects(db.Model):
         self.id = id
 
     def __repr__(self):
-        return "[name = '%s', email= '%s', description= '%s', dependencies= '%s']" % (self.name, self.email,
-                                                                                      self.description,
-                                                                                      self.dependencies)
+        return "[name = '%s', email= '%s', " \
+               "description= '%s', dependencies= '%s']" \
+               % (self.name, self.email, self.description, self.dependencies)
 
     def to_json(self):
         return {
@@ -46,8 +47,9 @@ class Canary(db.Model):
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
     results = db.relationship('Results', backref='canary', lazy='dynamic')
 
-    def __init__(self, name, description=None, meta_data=None, status='ACTIVE', criteria=None, health='GREEN', id=None,
-                 project_id=project_id):
+    def __init__(self, name, description=None, meta_data=None,
+                 status='ACTIVE', criteria=None, health='GREEN',
+                 id=None, project_id=project_id):
         self.name = name
         self.description = description
         self.meta_data = meta_data
@@ -78,7 +80,8 @@ class Results(db.Model):
     created_at = db.Column('created_at', db.DateTime())
     canary_id = db.Column(db.Integer, db.ForeignKey('canaries.id'))
 
-    def __init__(self, status=status, created_at=None, failure_details=None, id=None,
+    def __init__(self, status=status, created_at=None,
+                 failure_details=None, id=None,
                  canary_id=canary_id):
         self.status = status
         self.failure_details = failure_details
