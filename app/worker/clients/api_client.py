@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from data_client import DataClient
-import requests, json
+import requests
+import json
 
 
 class APIClient(DataClient):
@@ -22,30 +23,38 @@ class APIClient(DataClient):
         self.base_url = base_url
 
     def get_canary(self, project_id, canary_id):
-        canary_url = "{base_url}/api/projects/{project_id}/canary/{canary_id}".format(
+        url_str = "{base_url}/api/projects/{project_id}/canary/{canary_id}"
+        canary_url = url_str.format(
             base_url=self.base_url, project_id=project_id, canary_id=canary_id)
-
         canary = requests.get(canary_url)
         return canary.json()
 
     def update_canary(self, project_id, canary_id, health):
-        canary_url = "{base_url}/api/projects/{project_id}/canary/{canary_id}".format(
+        header = {'content-type': 'application/json'}
+        url_str = "{base_url}/api/projects/{project_id}/canary/{canary_id}"
+        canary_url = url_str.format(
             base_url=self.base_url, project_id=project_id, canary_id=canary_id)
-        update = requests.put(canary_url, data=json.dumps({'health': health}),
-                              headers={'content-type': 'application/json'})
+        update = requests.put(canary_url,
+                              data=json.dumps({'health': health}),
+                              headers=header)
         return update
 
     def get_results(self, project_id, canary_id, **kwargs):
-        canary_url = "{base_url}/api/projects/{project_id}/canary/{canary_id}/results".format(base_url=self.base_url,
-                                                                                              project_id=project_id,
-                                                                                              canary_id=canary_id)
+        url_str = "{base_url}/api/projects/{project_id}/canary/{canary_id}" \
+                  "/results"
+        canary_url = url_str.format(
+            base_url=self.base_url, project_id=project_id, canary_id=canary_id)
         canary_results = requests.get(canary_url, params=kwargs)
         return canary_results.json().get('results')
 
     def post_results(self, project_id, canary_id, data):
-        canary_url = '{base_url}/api/projects/{project_id}/canary/{canary_id}/results'.format(
+        header = {'content-type': 'application/json'}
+        url_str = "{base_url}/api/projects/{project_id}/canary/{canary_id}" \
+                  "/results"
+        canary_url = url_str.format(
             base_url=self.base_url, project_id=project_id, canary_id=canary_id)
-        result_post = requests.post(canary_url, data=json.dumps(data),
-                                    headers={'content-type': 'application/json'})
+        post_result = requests.post(canary_url,
+                                    data=json.dumps(data),
+                                    headers=header)
 
-        return result_post
+        return post_result

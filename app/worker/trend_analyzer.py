@@ -14,38 +14,51 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         status_list = []
         length = len(results_list)
         analysis_list = []
-        start_time = datetime.strptime(results_list[0].get('created_at'), '%Y-%m-%d %H:%M:%S.%f')
+        time_format = '%Y-%m-%d %H:%M:%S.%f'
+        start_time = datetime.strptime(results_list[0].get('created_at'),
+                                       format=time_format)
         border = start_time + resolution
         index = 0
         labels = []
         while index < length:
             if index != length - 1:
-                created_at = datetime.strptime(results_list[index].get('created_at'), '%Y-%m-%d %H:%M:%S.%f')
+                created_at = datetime.strptime(results_list[index].
+                                               get('created_at'),
+                                               format=time_format)
                 if created_at <= border:
-                    analysis_list.append(results_list[index].get('status'))
+                    analysis_list.append(results_list[index].
+                                         get('status'))
                     index += 1
                 else:
                     if analysis_list:
                         labels.append("{}".format(border - resolution))
-                        status_list.append(self.trend_analyzer(threshold, analysis_list))
+                        result = self.trend_analyzer(threshold, analysis_list)
+                        status_list.append(result)
                         analysis_list = []
                     border = border + resolution
             else:
-                created_at = datetime.strptime(results_list[index].get('created_at'), '%Y-%m-%d %H:%M:%S.%f')
+                created_at = datetime.strptime(results_list[index].
+                                               get('created_at'),
+                                               format=time_format)
                 if created_at <= border:
                     labels.append("{}".format(border - resolution))
                     analysis_list.append(results_list[index].get('status'))
-                    status_list.append(self.trend_analyzer(threshold, analysis_list))
+                    result = self.trend_analyzer(threshold, analysis_list)
+                    status_list.append(result)
                 else:
                     labels.append("{}".format(border - resolution))
-                    status_list.append(self.trend_analyzer(threshold, analysis_list))
+                    result = self.trend_analyzer(threshold, analysis_list)
+                    status_list.append(result)
                     analysis_list = []
                     border = border + resolution
                     while True:
                         if created_at <= border:
                             labels.append("{}".format(border - resolution))
-                            analysis_list.append(results_list[index].get('status'))
-                            status_list.append(self.trend_analyzer(threshold, analysis_list))
+                            analysis_list.append(
+                                results_list[index].get('status'))
+                            result = self.trend_analyzer(
+                                threshold, analysis_list)
+                            status_list.append(result)
                             break
                         else:
                             border = border + resolution

@@ -12,8 +12,10 @@ def projects():
         all_projects = query.all()
         projects_list = []
         for obj in all_projects:
-            project = Projects(name=obj.name, email=obj.email, description=obj.description,
-                               dependencies=obj.dependencies, id=obj.id)
+            project = Projects(name=obj.name, email=obj.email,
+                               description=obj.description,
+                               dependencies=obj.dependencies,
+                               id=obj.id)
             projects_list.append(project.to_json())
         get_response = jsonify(projects=projects_list)
         get_response.status_code = 200
@@ -35,8 +37,10 @@ def project(project_id):
         project = Projects.query.get(project_id)
         if project is None:
             return bad_request('project_id not found')
-        get_response = jsonify(name=project.name, email=project.email, description=project.description,
-                               dependencies=project.dependencies, id=project.id)
+        get_response = jsonify(name=project.name, email=project.email,
+                               description=project.description,
+                               dependencies=project.dependencies,
+                               id=project.id)
         get_response.status_code = 200
         return get_response
 

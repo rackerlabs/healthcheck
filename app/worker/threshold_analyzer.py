@@ -37,7 +37,7 @@ class ThresholdAnalyzer(BaseAnalyzer):
         else:
             return False
 
-    def get_canary_params(self, canary_id, project_id):
+    def get_canary_param(self, canary_id, project_id):
         canary = self.api_client.get_canary(project_id, canary_id)
         current_health = canary.get('health')
         criteria = canary.get('criteria')
