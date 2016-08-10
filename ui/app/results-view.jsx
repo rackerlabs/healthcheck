@@ -15,14 +15,14 @@ var ResultsView = React.createClass({
         return this.props.params.project_id || this.props.project_id;
     },
 
-    buildId: function() {
-        return this.props.params.build_id || this.props.build_id;
+    canaryId: function() {
+        return this.props.params.canary_id || this.props.canary_id;
     },
 
     componentDidMount: function() {
-        var url = "/api/projects/" + this.projectId() + "/builds/" + this.buildId() +
+        var url = "/api/projects/" + this.projectId() + "/canary/" + this.canaryId() +
                   "/results";
-        this.buildsRequest = $.get(url, function(result) {
+        this.canaryRequest = $.get(url, function(result) {
             this.setState({
                 results: result.results,
                 metadata: result.metadata,
@@ -31,7 +31,7 @@ var ResultsView = React.createClass({
     },
 
     componentWillUnmount: function() {
-        this.buildsRequest.abort();
+        this.canaryRequest.abort();
     },
 
     render: function() {

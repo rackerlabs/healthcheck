@@ -4,16 +4,15 @@ import ResourceTable from './resource-table';
 var ResultsTable = React.createClass({
 
     columnTitles: [
-        "Id", "Build Id", "Project Id", "Result", "Result Message",
-        "Test Name", "Timestamp",
+        "Id", "Created At", "Status", "Failure Details",
+
     ],
     columnKeys: [
-        "id", "build_id", "project_id", "result", "result_message",
-        "test_name", "timestamp",
+        "id", "created_at", "status", "failure_details",
     ],
     columnLinks: {
         project_id: function(r) {
-            return "/projects/" + r.project_id + "/builds";
+            return "/projects/" + r.project_id + "/canary";
         },
     },
 

@@ -1,21 +1,26 @@
 import React from 'react';
 import ResourceTable from './resource-table';
 
-var BuildsTable = React.createClass({
+var CanaryTable = React.createClass({
 
     columnTitles: [
-        "Id", "Name", "Description", "Criteria"
+        "Id", "Name", "Status", "Health", "Description"
     ],
+
     columnKeys: [
-        "id", "name", "description", "criteria"
+        "id", "name", "status", "health", "description"
     ],
-    columnLinks: {
-        name: function(canary) {
-            return "/projects/" + canary.project_id + "/canary/" + canary.id + "/results";
-        },
-        id: function(canary) {
-            return "/projects/" + canary.project_id + "/canary/" + canary.id + "/results";
-        }
+
+    getColumnLinks: function() {
+        var project_id = this.props.project_id;
+        return {
+                 name: function(canary) {
+                    return "/projects/" + project_id + "/canary/" + canary.id + "/results";
+                 },
+                 id: function(canary) {
+                    return "/projects/" + project_id + "/canary/" + canary.id + "/results";
+                 }
+               }
     },
 
     render: function() {
@@ -23,10 +28,10 @@ var BuildsTable = React.createClass({
             <ResourceTable resources={this.props.canary}
                             columnTitles={this.columnTitles}
                             columnKeys={this.columnKeys}
-                            columnLinks={this.columnLinks} />
+                            columnLinks={this.getColumnLinks()} />
         );
     }
 
 });
 
-export default BuildsTable;
+export default CanaryTable;
