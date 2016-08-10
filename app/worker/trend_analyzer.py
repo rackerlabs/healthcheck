@@ -54,8 +54,10 @@ class TrendAnalyzer(BaseTrendAnalyzer):
                     while True:
                         if created_at <= border:
                             labels.append("{}".format(border - resolution))
-                            analysis_list.append(results_list[index].get('status'))
-                            result = self.trend_analyzer(threshold, analysis_list)
+                            analysis_list.append(
+                                results_list[index].get('status'))
+                            result = self.trend_analyzer(
+                                threshold, analysis_list)
                             status_list.append(result)
                             break
                         else:
