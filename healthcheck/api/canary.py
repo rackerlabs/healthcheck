@@ -1,11 +1,12 @@
 from flask import jsonify, request
-from .. import db
-from ..models import Canary, Results
-from . import api
-from .errors import bad_request
 from sqlalchemy import and_, text
-from app.worker.tasks import process_trend
 import pygal
+
+from healthcheck import db
+from healthcheck.data.models import Canary, Results
+from healthcheck.api import api
+from healthcheck.api.errors import bad_request
+from healthcheck.worker.tasks import process_trend
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',

@@ -1,7 +1,8 @@
 import unittest
 import json
-from app import create_app, db
-from app.models import Projects
+
+from healthcheck import create_app, db
+from healthcheck.data.models import Projects
 
 header = {'content-type': 'application/json'}
 content_type = 'application/json'

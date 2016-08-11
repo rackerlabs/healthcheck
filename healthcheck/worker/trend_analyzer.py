@@ -1,12 +1,14 @@
 from __future__ import division
 from datetime import datetime, timedelta
-from ..worker.base_trend_analyzer import BaseTrendAnalyzer
-from ..worker.clients.api_client import APIClient
+from healthcheck.config import get_config
+from healthcheck.worker.base_trend_analyzer import BaseTrendAnalyzer
+from healthcheck.worker.clients.api_client import APIClient
 
 
 class TrendAnalyzer(BaseTrendAnalyzer):
     def __init__(self):
-        self.api_client = APIClient(base_url="http://localhost:5000")
+        config = get_config()
+        self.api_client = APIClient(base_url=config.API_URL)
 
     def process_trend(self, resolution, threshold, results_list):
         results_list = sorted(results_list)
@@ -16,7 +18,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         analysis_list = []
         time_format = '%Y-%m-%d %H:%M:%S.%f'
         start_time = datetime.strptime(results_list[0].get('created_at'),
-                                       format=time_format)
+                                       time_format)
         border = start_time + resolution
         index = 0
         labels = []
@@ -24,7 +26,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
             if index != length - 1:
                 created_at = datetime.strptime(results_list[index].
                                                get('created_at'),
-                                               format=time_format)
+                                               time_format)
                 if created_at <= border:
                     analysis_list.append(results_list[index].
                                          get('status'))
@@ -39,7 +41,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
             else:
                 created_at = datetime.strptime(results_list[index].
                                                get('created_at'),
-                                               format=time_format)
+                                               time_format)
                 if created_at <= border:
                     labels.append("{}".format(border - resolution))
                     analysis_list.append(results_list[index].get('status'))

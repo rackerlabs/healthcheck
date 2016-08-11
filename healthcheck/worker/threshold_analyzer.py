@@ -14,13 +14,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from __future__ import division
-from ..worker.base_analyzer import BaseAnalyzer
-from ..worker.clients.api_client import APIClient
+from healthcheck.config import get_config
+from healthcheck.worker.base_analyzer import BaseAnalyzer
+from healthcheck.worker.clients.api_client import APIClient
 
 
 class ThresholdAnalyzer(BaseAnalyzer):
     def __init__(self):
-        self.api_client = APIClient(base_url="http://localhost:5000")
+        config = get_config()
+        self.api_client = APIClient(base_url=config.API_URL)
 
     def analyze_results(self, threshold, results):
         passes = 0

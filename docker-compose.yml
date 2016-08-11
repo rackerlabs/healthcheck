@@ -1,26 +1,41 @@
-canary:
-  restart: always
-  build: ./canary
-  expose:
-    - "5000"
-  links:
-    - postgres:postgres
-  command: /canary/manage.py
+version: '2'
+services:
+  api:
+    build: .
+    image: canary-api
+    container_name: canary-api
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+    links:
+      - db
+      - worker
+      - queue
+    volumes:
+      - .:/canary
+  worker:
+    image: canary-api
+    container_name: canary-worker
+    depends_on:
+      - queue
+    links:
+      - queue
+    command: su -m canary-worker -c 'celery --app=healthcheck.worker.tasks worker'
+    volumes:
+        - .:/canary
 
+  db:
+    image: postgres:latest
+    container_name: canary-db
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: canaryDB
+    ports:
+      - "5432:5432"
 
-data:
-  restart: no
-  image: postgres:latest
-  volumes:
-    - /var/lib/postgresql
-  command: true
-
-
-postgres:
-  restart: always
-  image: postgres:latest
-  volumes_from:
-    - data
-  ports:
-    - "5432:5432"
-
+  queue:
+    image: redis:latest
+    container_name: canary-queue
+    ports:
+      - "6379:6379"

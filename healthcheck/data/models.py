@@ -1,4 +1,4 @@
-from . import db
+from healthcheck import db
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 

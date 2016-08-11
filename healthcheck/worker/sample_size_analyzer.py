@@ -1,18 +1,18 @@
-from ..worker.threshold_analyzer import ThresholdAnalyzer
+from healthcheck.worker.threshold_analyzer import ThresholdAnalyzer
 
 
-class ResolutionAnalyzer(ThresholdAnalyzer):
+class SampleSizeAnalyzer(ThresholdAnalyzer):
     def __init__(self):
         ThresholdAnalyzer.__init__(self)
 
-    def process_canary(self, project_id, canary_id):
+    def process_canary(self, canary_id, project_id):
         current_health, criteria = self.get_canary_param(canary_id=canary_id,
                                                          project_id=project_id)
-        resolution = criteria.get('resolution')
+        sample_size = criteria.get('result_sample_size')
         threshold = criteria.get('threshold')
         canary_results = self.api_client.get_results(canary_id=canary_id,
                                                      project_id=project_id,
-                                                     interval=resolution)
+                                                     sample_size=sample_size)
         green_health = self.analyze_results(threshold=threshold,
                                             results=canary_results)
         if not green_health and current_health == "GREEN":
