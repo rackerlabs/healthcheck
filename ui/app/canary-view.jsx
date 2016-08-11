@@ -29,7 +29,7 @@ var CanaryView = React.createClass({
     render: function() {
         return (
             <div>
-                <h2 className="rs-page-title">Canary</h2>
+                <h2 className="rs-page-title">Canaries</h2>
                 <CanaryTable canary={this.state.canary} project_id={this.projectId()} />
             </div>
         );

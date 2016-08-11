@@ -24,8 +24,7 @@ var ResultsView = React.createClass({
                   "/results";
         this.canaryRequest = $.get(url, function(result) {
             this.setState({
-                results: result.results,
-                metadata: result.metadata,
+                results: result.results
             })
         }.bind(this))
     },
@@ -37,10 +36,7 @@ var ResultsView = React.createClass({
     render: function() {
         return (
             <div>
-                <h2 className="rs-page-title">Results</h2>
-                <h3>Summary</h3>
-                <ResultsMetadata metadata={this.state.metadata} />
-                <h3>All results</h3>
+                <h2 className="rs-page-title">Canary Results</h2>
                 <ResultsTable results={this.state.results} />
             </div>
         );
