@@ -51,3 +51,6 @@ config = {
     'docker': DockerConfig,
     'default': DevelopmentConfig
 }
+
+def get_config(config_name=None):
+    return config.get(config_name or os.getenv('FLASK_CONFIG') or 'default')

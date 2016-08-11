@@ -1,12 +1,14 @@
 from __future__ import division
 from datetime import datetime, timedelta
+from healthcheck.config import get_config
 from healthcheck.worker.base_trend_analyzer import BaseTrendAnalyzer
 from healthcheck.worker.clients.api_client import APIClient
 
 
 class TrendAnalyzer(BaseTrendAnalyzer):
     def __init__(self):
-        self.api_client = APIClient(base_url="http://localhost:5000")
+        config = get_config()
+        self.api_client = APIClient(base_url=config.API_URL)
 
     def process_trend(self, resolution, threshold, results_list):
         results_list = sorted(results_list)

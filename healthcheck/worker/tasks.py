@@ -15,11 +15,11 @@ limitations under the License.
 """
 from celery import Celery
 
-import os
-from healthcheck.config import config as app_config
+from healthcheck.config import get_config
 from sample_size_analyzer import SampleSizeAnalyzer
 from trend_analyzer import TrendAnalyzer
-config = app_config[os.getenv('FLASK_CONFIG') or 'default']
+
+config = get_config()
 worker_app = Celery("canary_analyzer", broker=config.CELERY_BROKER_URL,
                     backend=config.CELERY_RESULT_BACKEND,
                     include=["healthcheck.worker.tasks"])

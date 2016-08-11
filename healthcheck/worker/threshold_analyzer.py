@@ -14,17 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from __future__ import division
-
-import os
-
-from healthcheck.config import config as app_config
+from healthcheck.config import get_config
 from healthcheck.worker.base_analyzer import BaseAnalyzer
 from healthcheck.worker.clients.api_client import APIClient
 
 
 class ThresholdAnalyzer(BaseAnalyzer):
     def __init__(self):
-        config = app_config[os.getenv('FLASK_CONFIG') or 'default']
+        config = get_config()
         self.api_client = APIClient(base_url=config.API_URL)
 
     def analyze_results(self, threshold, results):

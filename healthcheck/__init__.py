@@ -1,18 +1,17 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from healthcheck.config import config
+from healthcheck.config import get_config
 
 db = SQLAlchemy()
 
 
 def create_app(config_name=None):
-    if config_name is None:
-        config_name = 'default'
     app = Flask(__name__)
-    app.config.from_object(config[config_name])
+    config = get_config(config_name=config_name)
+    app.config.from_object(config)
 
-    config[config_name].init_app(app)
+    config.init_app(app)
 
     db.init_app(app)
     with app.app_context():
