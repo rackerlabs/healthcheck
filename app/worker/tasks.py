@@ -14,11 +14,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from celery import Celery
+
+import os
+from app.config import config as app_config
 from sample_size_analyzer import SampleSizeAnalyzer
 from trend_analyzer import TrendAnalyzer
-
-worker_app = Celery("canary_analyzer", broker="redis://queue:6379/0",
-                    backend="redis://queue:6379/0",
+config = app_config[os.getenv('FLASK_CONFIG') or 'default']
+worker_app = Celery("canary_analyzer", broker=config.CELERY_BROKER_URL,
+                    backend=config.CELERY_RESULT_BACKEND,
                     include=["app.worker.tasks"])
 
 analyzer = SampleSizeAnalyzer()

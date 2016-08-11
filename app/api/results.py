@@ -1,9 +1,10 @@
 from flask import jsonify, request
-from .. import db
-from ..models import Results
-from . import api
-from .errors import bad_request
 from sqlalchemy import and_, text
+
+from app import db
+from app.data.models import Results
+from app.api import api
+from app.api.errors import bad_request
 from app.worker.tasks import process_canary
 
 

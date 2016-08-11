@@ -1,4 +1,4 @@
-from . import db
+from app import db
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 

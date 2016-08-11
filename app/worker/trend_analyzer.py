@@ -1,7 +1,7 @@
 from __future__ import division
 from datetime import datetime, timedelta
-from ..worker.base_trend_analyzer import BaseTrendAnalyzer
-from ..worker.clients.api_client import APIClient
+from app.worker.base_trend_analyzer import BaseTrendAnalyzer
+from app.worker.clients.api_client import APIClient
 
 
 class TrendAnalyzer(BaseTrendAnalyzer):

@@ -1,5 +1,6 @@
 import unittest
-from app.models import Projects
+
+from app.data.models import Projects
 
 
 class ModelsTest(unittest.TestCase):

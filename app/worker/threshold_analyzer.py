@@ -14,13 +14,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 from __future__ import division
-from ..worker.base_analyzer import BaseAnalyzer
-from ..worker.clients.api_client import APIClient
+
+import os
+
+from app.config import config as app_config
+from app.worker.base_analyzer import BaseAnalyzer
+from app.worker.clients.api_client import APIClient
 
 
 class ThresholdAnalyzer(BaseAnalyzer):
     def __init__(self):
-        self.api_client = APIClient(base_url="http://localhost:5000")
+        config = app_config[os.getenv('FLASK_CONFIG') or 'default']
+        self.api_client = APIClient(base_url=config.API_URL)
 
     def analyze_results(self, threshold, results):
         passes = 0

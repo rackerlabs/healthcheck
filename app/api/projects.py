@@ -1,8 +1,9 @@
 from flask import jsonify, request
-from .. import db
-from ..models import Projects
-from . import api
-from .errors import bad_request
+
+from app import db
+from app.data.models import Projects
+from app.api import api
+from app.api.errors import bad_request
 
 
 @api.route('/projects', methods=['GET', 'POST'])
