@@ -39,3 +39,13 @@ services:
     container_name: canary-queue
     ports:
       - "6379:6379"
+
+  ui:
+    build:
+      context: ./ui
+    image: canary-ui
+    container_name: canary-ui
+    ports:
+      - "5001:80"
+    depends_on:
+      - api
