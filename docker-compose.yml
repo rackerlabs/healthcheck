@@ -12,7 +12,8 @@ services:
       - db
       - worker
       - queue
-
+    volumes:
+      - .:/canary
   worker:
     image: canary-api
     container_name: canary-worker
@@ -20,7 +21,9 @@ services:
       - queue
     links:
       - queue
-    command: su -m canary-worker -c 'celery --app=app.worker.tasks worker'
+    command: su -m canary-worker -c 'celery --app=healthcheck.worker.tasks worker'
+    volumes:
+        - .:/canary
 
   db:
     image: postgres:latest
