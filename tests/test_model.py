@@ -1,6 +1,6 @@
 import unittest
 
-from app.data.models import Projects
+from healthcheck.data.models import Projects
 
 
 class ModelsTest(unittest.TestCase):

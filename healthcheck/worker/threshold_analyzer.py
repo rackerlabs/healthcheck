@@ -17,9 +17,9 @@ from __future__ import division
 
 import os
 
-from app.config import config as app_config
-from app.worker.base_analyzer import BaseAnalyzer
-from app.worker.clients.api_client import APIClient
+from healthcheck.config import config as app_config
+from healthcheck.worker.base_analyzer import BaseAnalyzer
+from healthcheck.worker.clients.api_client import APIClient
 
 
 class ThresholdAnalyzer(BaseAnalyzer):

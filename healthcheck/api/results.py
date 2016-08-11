@@ -1,11 +1,11 @@
 from flask import jsonify, request
 from sqlalchemy import and_, text
 
-from app import db
-from app.data.models import Results
-from app.api import api
-from app.api.errors import bad_request
-from app.worker.tasks import process_canary
+from healthcheck import db
+from healthcheck.data.models import Results
+from healthcheck.api import api
+from healthcheck.api.errors import bad_request
+from healthcheck.worker.tasks import process_canary
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/results',

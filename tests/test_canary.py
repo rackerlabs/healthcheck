@@ -1,6 +1,6 @@
 import unittest
 import json
-from app import create_app, db
+from healthcheck import create_app, db
 
 header = {'content-type': 'application/json'}
 content_type = 'application/json'

@@ -1,4 +1,4 @@
-from app.worker.threshold_analyzer import ThresholdAnalyzer
+from healthcheck.worker.threshold_analyzer import ThresholdAnalyzer
 
 
 class SampleSizeAnalyzer(ThresholdAnalyzer):

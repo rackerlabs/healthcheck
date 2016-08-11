@@ -1,5 +1,5 @@
 from random import seed, randint
-from app.worker.clients.api_client import APIClient
+from healthcheck.worker.clients.api_client import APIClient
 import forgery_py
 from datetime import datetime, timedelta
 import radar

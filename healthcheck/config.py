@@ -21,6 +21,7 @@ class DevelopmentConfig(Config):
     CELERY_RESULT_BACKEND = 'redis://192.168.99.100:6379/0'
     API_URL = 'http://localhost:5000'
 
+
 class LocalhostDevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
@@ -29,10 +30,12 @@ class LocalhostDevelopmentConfig(Config):
     CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
     API_URL = 'http://localhost:5000'
 
+
 class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
         'postgresql://localhost/testdb'
+
 
 class DockerConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
