@@ -18,7 +18,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         analysis_list = []
         time_format = '%Y-%m-%d %H:%M:%S.%f'
         start_time = datetime.strptime(results_list[0].get('created_at'),
-                                       format=time_format)
+                                       time_format)
         border = start_time + resolution
         index = 0
         labels = []
@@ -26,7 +26,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
             if index != length - 1:
                 created_at = datetime.strptime(results_list[index].
                                                get('created_at'),
-                                               format=time_format)
+                                               time_format)
                 if created_at <= border:
                     analysis_list.append(results_list[index].
                                          get('status'))
@@ -41,7 +41,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
             else:
                 created_at = datetime.strptime(results_list[index].
                                                get('created_at'),
-                                               format=time_format)
+                                               time_format)
                 if created_at <= border:
                     labels.append("{}".format(border - resolution))
                     analysis_list.append(results_list[index].get('status'))
