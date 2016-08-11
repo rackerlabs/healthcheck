@@ -39,7 +39,7 @@ class TestingConfig(Config):
 
 class DockerConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'postgresql://postgres:password@db:5432/canaryDB'
+        'postgresql://postgres:password@db:5432/postgres'
     CELERY_BROKER_URL = 'redis://queue:6379/0'
     CELERY_RESULT_BACKEND = 'redis://queue:6379/0'
     API_URL = 'http://api:5000'
@@ -51,6 +51,7 @@ config = {
     'docker': DockerConfig,
     'default': DevelopmentConfig
 }
+
 
 def get_config(config_name=None):
     return config.get(config_name or os.getenv('FLASK_CONFIG') or 'default')
