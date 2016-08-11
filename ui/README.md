@@ -1,8 +1,8 @@
-tetra ui
+Canary Health Check As A Service UI
 --------
 
-This is a dashboard for tetra. It uses react, with npm to manage (certain)
-dependencies.
+This is a dashboard for the canary health check as a service. It uses react,
+with npm to manage (certain) dependencies.
 
 
 quickstart
@@ -15,17 +15,11 @@ First, install dependencies with npm and build the code:
     $ npm install
     $ npm run build
 
-The tetra dashboard starts up with the rest of the docker containers. From the
+The dashboard starts up with the rest of the docker containers. From the
 root of this repository run:
 
-    ### make commands are run where the makefile is located
-    $ cd ..
-    $ make docker-build
-    $ make docker-dev
-
-To find the location of the dashboard, run
-
-    $ make docker-port
+    $ docker-compose build
+    $ docker-compose up
 
 Then open up the dashboard in your browser.
 
@@ -38,7 +32,7 @@ To install npm dependencies (installed to `./node_modules/`):
     npm install
 
 To compile jsx files into plain javascript, and bundle all that javascript into
-one file (output to `./dist/tetra.bundle.js`):
+one file (output to `./dist/healthcheck.bundle.js`):
 
     npm run build
 
@@ -102,7 +96,7 @@ Then we can do
 
     $ npm run do-a-thing
 
-    > tetra-ui@1.0.0 do-a-thing /root/tetra/ui
+    > healthcheck-ui@1.0.0 do-a-thing /root/healthcheck/ui
     > echo 'hello'
 
     hello
@@ -142,7 +136,7 @@ in our html.
 
 In our case, the bundler is [webpack](https://webpack.github.io/). When you
 invoke `npm run build`, babel will run first, followed by webpack. Webpack
-spits out `tetra.bundle.js`. Then in our index.html, we include the bundled
+spits out `healthcheck.bundle.js`. Then in our index.html, we include the bundled
 javascript,
 
-    <script src="/dist/tetra.bundle.js"></script>
+    <script src="/dist/healthcheck.bundle.js"></script>

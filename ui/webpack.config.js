@@ -5,7 +5,7 @@ module.exports = {
     entry: './dist/main.js',
     output: {
         path: './dist',
-        filename: 'canary.bundle.js',
+        filename: 'healthcheck.bundle.js',
     },
 
     // disable warnings from third-party code
