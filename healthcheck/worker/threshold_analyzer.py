@@ -24,6 +24,9 @@ class ThresholdAnalyzer(BaseAnalyzer):
         config = get_config()
         self.api_client = APIClient(base_url=config.API_URL)
 
+    def process_canary(self, project_id, canary_id):
+        raise NotImplementedError
+
     def analyze_results(self, threshold, results):
         passes = 0
         fails = 0
@@ -39,8 +42,8 @@ class ThresholdAnalyzer(BaseAnalyzer):
         else:
             return False
 
-    def get_canary_param(self, canary_id, project_id):
-        canary = self.api_client.get_canary(project_id, canary_id)
+    def get_canary_params(self, canary_id, project_id):
+        canary = self.api_client.get_canary(project_id=project_id, canary_id=canary_id)
         current_health = canary.get('health')
         criteria = canary.get('criteria')
         return current_health, criteria
