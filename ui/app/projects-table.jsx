@@ -3,15 +3,12 @@ import ResourceTable from './resource-table';
 
 var ProjectsTable = React.createClass({
 
-    columnTitles: ["Id", "Name"],
-    columnKeys: ["id", "name"],
+    columnTitles: ["Name"],
+    columnKeys: ["name"],
     columnLinks: {
         "name": function(project) {
             return "/projects/" + project.id + "/canary";
-        },
-        "id": function(project) {
-            return "/projects/" + project.id + "/canary";
-        },
+        }
     },
 
     render: function() {

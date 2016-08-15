@@ -4,7 +4,7 @@
   "description": "Canary health check dashboard",
   "main": "app/main.js",
   "dependencies": {
-    "canon-react": "^0.11.1",
+    "canon-react": "^0.14.0",
     "react": "~0.14.8",
     "react-dom": "~0.14.8",
     "react-router": "^2.4.1"

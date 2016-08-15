@@ -9,13 +9,12 @@ var ResourceTableEntry = React.createClass({
         var columnLinks = this.props.columnLinks;
         return (
             <tr>
-                <td className="rs-table-status rs-table-status-ok"> </td>
+                { this.status(resource) }
                 { this.columns(resource, columnKeys, columnLinks) }
             </tr>
         );
     },
 
-    // todo: we need to be able to configure the column order
     columns: function(resource, columnKeys, columnLinks) {
         var result = [];
         for (var i = 0; i < columnKeys.length; i++) {
@@ -36,6 +35,15 @@ var ResourceTableEntry = React.createClass({
         }
         return result;
     },
+
+    status:  function(resource) {
+        if (resource["health"] === "RED" || resource["status"] === "fail") {
+            return <td className="rs-table-status rs-table-status-error"> </td>
+        } else {
+            return <td className="rs-table-status rs-table-status-ok"> </td>
+        }
+    }
+
 
 });
 
