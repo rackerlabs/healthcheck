@@ -30,6 +30,9 @@ class CanaryTest(unittest.TestCase):
         self.app_context.push()
         db.create_all()
         self.client = self.app.test_client()
+        canary_project = self.post_fake_project()
+        self.assertEquals(canary_project.status_code, 201)
+        self.assertEquals(json.loads(canary_project.data).get('id'), 1)
 
     def tearDown(self):
         db.session.remove()
@@ -65,9 +68,6 @@ class CanaryTest(unittest.TestCase):
         return data
 
     def test_post_canary(self):
-        canary_project = self.post_fake_project()
-        self.assertEquals(canary_project.status_code, 201)
-        self.assertEquals(json.loads(canary_project.data).get('id'), 1)
         post_canary = self.post_fake_canary()
         self.assertEquals(post_canary.status_code, 201)
         json_data = json.loads(post_canary.data)
@@ -75,9 +75,6 @@ class CanaryTest(unittest.TestCase):
                           "EXPECTED {}, GOT {}".format(expected_data, json_data))
 
     def test_get_canary(self):
-        fake_project = self.post_fake_project()
-        self.assertEquals(fake_project.status_code, 201)
-        self.assertEquals(json.loads(fake_project.data).get('id'), 1)
         post_canary = self.post_fake_canary()
         self.assertEquals(post_canary.status_code, 201)
         get_canary = self.client.get('api/projects/1/canary/1', content_type='application/json')
@@ -87,17 +84,12 @@ class CanaryTest(unittest.TestCase):
                           "EXPECTED {}, GOT {}".format(expected_data, json_data))
 
     def test_get_canaries(self):
-        fake_project = self.post_fake_project()
-        self.assertEquals(fake_project.status_code, 201)
         self.fake_canary()
         self.fake_canary()
         get_canary = self.client.get('api/projects/1/canary', content_type='application/json')
         self.assertEquals(get_canary.status_code, 200)
-        # DO MORE CHECKS
 
     def test_edit_canary(self):
-        fake_project = self.post_fake_project()
-        self.assertEquals(fake_project.status_code, 201)
         self.post_fake_canary()
         edit_response = self.client.put('api/projects/1/canary/1', data=json.dumps(
             {'criteria': {'threshold': '100%', 'expected_run_frequency': '5hrs', 'result_sample_size': '10'}}),
@@ -110,8 +102,6 @@ class CanaryTest(unittest.TestCase):
                           "EXPECTED {}, GOT {}".format({'threshold': '100%'}, response_data.get('criteria')))
 
     def test_delete_canary(self):
-        fake_project = self.post_fake_project()
-        self.assertEquals(fake_project.status_code, 201)
         self.post_fake_canary()
         delete_canary = self.client.delete('api/projects/1/canary/1')
         self.assertEquals(delete_canary.status_code, 200)  # disabled the canary

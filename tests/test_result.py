@@ -42,6 +42,12 @@ class ResultTest(unittest.TestCase):
         self.app_context.push()
         db.create_all()
         self.client = self.app.test_client()
+        project = self.post_fake_project()
+        self.assertEquals(project.status_code, 201)
+        self.assertEquals(json.loads(project.data).get('id'), 1)
+        canary = self.post_fake_canary()
+        self.assertEquals(canary.status_code, 201)
+        self.assertEquals(json.loads(canary.data).get('id'), 1)
 
     def tearDown(self):
         db.session.remove()
@@ -86,12 +92,6 @@ class ResultTest(unittest.TestCase):
         return data
 
     def test_post_result(self):
-        project = self.post_fake_project()
-        self.assertEquals(project.status_code, 201)
-        self.assertEquals(json.loads(project.data).get('id'), 1)
-        canary = self.post_fake_canary()
-        self.assertEquals(canary.status_code, 201)
-        self.assertEquals(json.loads(canary.data).get('id'), 1)
         result = self.post_fake_result()
         self.assertEquals(result.status_code, 201)
         json_data = json.loads(result.data)
@@ -100,12 +100,6 @@ class ResultTest(unittest.TestCase):
         self.assertEquals(json_data.get('id'), 1, "result id does not match")
 
     def test_get_result(self):
-        project = self.post_fake_project()
-        self.assertEquals(project.status_code, 201)
-        self.assertEquals(json.loads(project.data).get('id'), 1)
-        canary = self.post_fake_canary()
-        self.assertEquals(canary.status_code, 201)
-        self.assertEquals(json.loads(canary.data).get('id'), 1)
         result = self.post_fake_result()
         self.assertEquals(result.status_code, 201)
         self.assertEquals(json.loads(result.data).get('id'), 1)
@@ -119,12 +113,6 @@ class ResultTest(unittest.TestCase):
                           "Test_Get_Result : Result status does not match")
 
     def test_get_results(self):
-        project = self.post_fake_project()
-        self.assertEquals(project.status_code, 201)
-        self.assertEquals(json.loads(project.data).get('id'), 1)
-        canary = self.post_fake_canary()
-        self.assertEquals(canary.status_code, 201)
-        self.assertEquals(json.loads(canary.data).get('id'), 1)
         results = 3
         for i in range(0, results):
             self.post_fake_result()
@@ -136,12 +124,6 @@ class ResultTest(unittest.TestCase):
                           "Test_Get_Results: Number of results do not match")
 
     def test_edit_result(self):
-        project = self.post_fake_project()
-        self.assertEquals(project.status_code, 201)
-        self.assertEquals(json.loads(project.data).get('id'), 1)
-        canary = self.post_fake_canary()
-        self.assertEquals(canary.status_code, 201)
-        self.assertEquals(json.loads(canary.data).get('id'), 1)
         result = self.post_fake_result()
         self.assertEquals(result.status_code, 201)
         self.assertEquals(json.loads(result.data).get('id'), 1)
@@ -159,12 +141,6 @@ class ResultTest(unittest.TestCase):
                               "", json_data.get('failure_details')))
 
     def test_delete_result(self):
-        project = self.post_fake_project()
-        self.assertEquals(project.status_code, 201)
-        self.assertEquals(json.loads(project.data).get('id'), 1)
-        canary = self.post_fake_canary()
-        self.assertEquals(canary.status_code, 201)
-        self.assertEquals(json.loads(canary.data).get('id'), 1)
         result = self.post_fake_result()
         self.assertEquals(result.status_code, 201)
         self.assertEquals(json.loads(result.data).get('id'), 1)
