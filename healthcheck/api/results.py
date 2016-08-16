@@ -37,7 +37,8 @@ def get_results(project_id, canary_id):
                                                 Results.created_at >=
                                                 query_string))
     else:
-        all_results = Results.query.filter_by(canary_id=canary_id)
+        all_results = Results.query.filter_by(canary_id=canary_id).\
+            order_by(Results.created_at.desc())
     result_list = []
     for obj in all_results:
         result_list.append(obj.results_to_json())
