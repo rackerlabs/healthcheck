@@ -27,9 +27,15 @@ var ResourceTableEntry = React.createClass({
                         <Link to={link}> {val} </Link>
                     </td>
                 );
+            } else if (key === "criteria"){
+                var threshold = val["threshold"];
+                var sample_size = val["result_sample_size"];
+                result.push(
+                    <td key={i} className="rs-table-link">{threshold}% of the {sample_size} most results results must pass</td>
+                );
             } else {
                 result.push(
-                    <td key={i} className="rs-table-link"> {val} </td>
+                    <td key={i} className="rs-table-link">{val}</td>
                 );
             }
         }

@@ -4,11 +4,11 @@ import ResourceTable from './resource-table';
 var CanaryTable = React.createClass({
 
     columnTitles: [
-        "Id", "Name", "Status", "Health", "Description"
+        "Id", "Name", "Status", "Health", "Health Criteria", "Description"
     ],
 
     columnKeys: [
-        "id", "name", "status", "health", "description"
+        "id", "name", "status", "health", "criteria", "description"
     ],
 
     getColumnLinks: function() {
