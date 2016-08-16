@@ -5,5 +5,6 @@ class BaseTrendAnalyzer(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def process_trend(self, resolution, threshold, interval, results_list):
+    def process_trend(self, resolution, threshold, interval, start_time,
+                      results_list):
         pass

@@ -10,7 +10,8 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         config = get_config()
         self.api_client = APIClient(base_url=config.API_URL)
 
-    def process_trend(self, resolution, threshold, interval, results_list):
+    def process_trend(self, resolution, threshold, interval, start_time,
+                      results_list):
         results_list = sorted(results_list)
         resolution = self.time_conversion(resolution)
         status_list = []
@@ -18,7 +19,6 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         analysis_list = []
         time_format = '%Y-%m-%d %H:%M:%S.%f'
         interval = self.time_conversion(interval)
-        start_time = datetime.utcnow()
         border = start_time - interval + resolution
         index = 0
         labels = []
