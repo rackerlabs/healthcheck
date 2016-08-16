@@ -96,13 +96,16 @@ def edit_canary(project_id, canary_id):
     if canary is None or canary.project_id != project_id:
         return bad_request('canary not found')
     data = request.get_json()
+    update_health = False
+    if data.get('health'):
+        update_health = True
     canary.name = data.get('name') or canary.name
     canary.description = data.get('description') or canary.description
     canary.meta_data = data.get('meta_data') or canary.meta_data
     canary.criteria = data.get('criteria') or canary.criteria
     canary.health = data.get('health') or canary.health
     db.session.commit()
-    put_response = jsonify(**canary.canary_to_json())
+    put_response = jsonify(**canary.canary_to_json(update_health=update_health))
     put_response.status_code = 200
     return put_response
 

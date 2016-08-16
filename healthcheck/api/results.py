@@ -1,6 +1,5 @@
 from flask import jsonify, request
 from sqlalchemy import and_, text
-
 from healthcheck import db
 from healthcheck.data.models import Results
 from healthcheck.api import api

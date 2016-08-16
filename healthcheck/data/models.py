@@ -44,22 +44,27 @@ class Canary(db.Model):
     status = db.Column('status', db.String(256))
     criteria = db.Column('criteria', JSON)
     health = db.Column('health', db.String(256))
+    updated_at = db.Column('updated_at', db.DateTime())
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
     results = db.relationship('Results', backref='canary', lazy='dynamic')
 
     def __init__(self, name, description=None, meta_data=None,
                  status='ACTIVE', criteria=None, health='GREEN',
-                 id=None, project_id=project_id):
+                 updated_at=None, id=None, project_id=project_id):
         self.name = name
         self.description = description
         self.meta_data = meta_data
         self.status = status
         self.criteria = criteria
         self.health = health
+        self.updated_at = updated_at or datetime.utcnow()
         self.id = id
         self.project_id = project_id
 
-    def canary_to_json(self):
+    def canary_to_json(self, **kwargs):
+        update_health = kwargs.get('update_health')
+        if update_health:
+            self.updated_at = datetime.utcnow()
         return {
             'name': self.name,
             'description': self.description,
@@ -67,6 +72,7 @@ class Canary(db.Model):
             'status': self.status,
             'criteria': self.criteria,
             'health': self.health,
+            'updated_at' : self.updated_at,
             'id': self.id
 
         }
