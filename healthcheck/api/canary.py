@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import jsonify, request
 from sqlalchemy import and_, text
 import pygal
@@ -22,8 +23,12 @@ def get_trend(project_id, canary_id):
     results_list = []
     for result in results:
         results_list.append(result.results_to_json())
+
+    start_time = datetime.utcnow()
     analysis_call = process_trend.delay(resolution=resolution,
                                         threshold=threshold,
+                                        interval=interval,
+                                        start_time=start_time,
                                         results_list=results_list)
     results_list, values = analysis_call.wait()
     labels = format_datetime(values=values, resolution=resolution)

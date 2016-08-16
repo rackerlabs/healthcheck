@@ -33,9 +33,10 @@ def get_results(project_id, canary_id):
     elif interval:
         query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - INTERVAL "
                             "'{}'".format(interval))
-        all_results = Results.query.filter(and_(Results.canary_id == canary_id,
-                                                Results.created_at >=
-                                                query_string))
+        all_results = Results.query.filter(
+            and_(Results.canary_id == canary_id,
+                 Results.created_at >= query_string))\
+            .order_by(Results.created_at.desc())
     else:
         all_results = Results.query.filter_by(canary_id=canary_id).\
             order_by(Results.created_at.desc())
