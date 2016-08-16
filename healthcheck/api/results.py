@@ -35,7 +35,8 @@ def get_results(project_id, canary_id):
                             "'{}'".format(interval))
         all_results = Results.query.filter(and_(Results.canary_id == canary_id,
                                                 Results.created_at >=
-                                                query_string))
+                                                query_string)). \
+            order_by(Results.created_at.desc())
     else:
         all_results = Results.query.filter_by(canary_id=canary_id).\
             order_by(Results.created_at.desc())

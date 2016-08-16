@@ -34,6 +34,6 @@ def process_canary(canary_id, project_id):
 
 
 @worker_app.task
-def process_trend(resolution, threshold, results_list):
-    return trend.process_trend(resolution=resolution,
+def process_trend(resolution, threshold, interval, results_list):
+    return trend.process_trend(resolution=resolution, interval=interval,
                                threshold=threshold, results_list=results_list)
