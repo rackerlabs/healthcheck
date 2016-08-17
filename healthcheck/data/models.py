@@ -1,4 +1,5 @@
 from healthcheck import db
+from flask import json
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 
@@ -45,26 +46,51 @@ class Canary(db.Model):
     criteria = db.Column('criteria', JSON)
     health = db.Column('health', db.String(256))
     updated_at = db.Column('updated_at', db.DateTime())
+    history = db.Column('history', JSON)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
     results = db.relationship('Results', backref='canary', lazy='dynamic')
 
     def __init__(self, name, description=None, meta_data=None,
                  status='ACTIVE', criteria=None, health='GREEN',
                  updated_at=None, id=None, project_id=project_id):
+        data = {"GREEN":"{}".format(datetime.utcnow())}
         self.name = name
         self.description = description
         self.meta_data = meta_data
         self.status = status
         self.criteria = criteria
         self.health = health
+        self.history = [data]
         self.updated_at = updated_at or datetime.utcnow()
         self.id = id
         self.project_id = project_id
 
-    def canary_to_json(self, **kwargs):
-        update_health = kwargs.get('update_health')
-        if update_health:
+
+    def update_health(self, **kwargs):
+        health_change = kwargs.get('health_change')
+        if health_change:
+            new_health = kwargs.get('new_health')
+            self.health = new_health
             self.updated_at = datetime.utcnow()
+            data = {new_health: "{}".format(datetime.utcnow())}
+            # new_list = self.history
+            # new_list.append(data)
+            # self.history = new_list
+            self.history.append(data)
+        else:
+            self.health = kwargs.get('old_health')
+
+
+    def canary_to_json(self, **kwargs):
+        # update_health = kwargs.get('update_health')
+        # if update_health:
+        #     health = kwargs.get('health')
+        #     data = {health:"{}".format(datetime.utcnow())}
+        #     # self.history.append(data)
+        #     new_list = self.history
+        #     new_list.append(data)
+        #     self.history = new_list
+
         return {
             'name': self.name,
             'description': self.description,
@@ -73,8 +99,8 @@ class Canary(db.Model):
             'criteria': self.criteria,
             'health': self.health,
             'updated_at' : self.updated_at,
+            'history' : self.history,
             'id': self.id
-
         }
 
 
