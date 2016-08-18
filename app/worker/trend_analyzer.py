@@ -59,8 +59,8 @@ class TrendAnalyzer(BaseTrendAnalyzer):
                         else:
                             border = border + resolution
                 index += 1
-        # print "STATUS LIST IS", status_list
-        # print "LABELS IS ", labels
+        print "STATUS LIST IS", status_list
+        print "LABELS IS ", labels
         return status_list, labels
 
     def trend_analyzer(self, threshold, results_list):
@@ -73,10 +73,11 @@ class TrendAnalyzer(BaseTrendAnalyzer):
                 fails += 1
         assert len(results_list) == (passes + fails)
         pass_percent = passes / len(results_list) * 100
-        if pass_percent > float(threshold):
-            return "green"
-        else:
-            return "red"
+        return pass_percent
+        # if pass_percent > float(threshold):
+        #     return "green"
+        # else:
+        #     return "red"
 
     def time_conversion(self, time_value):
         value = time_value.split()
