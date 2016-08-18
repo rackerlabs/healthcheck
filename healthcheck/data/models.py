@@ -1,4 +1,7 @@
+import copy
+
 from healthcheck import db
+from flask import json
 from sqlalchemy.dialects.postgresql import JSON
 from datetime import datetime
 
@@ -45,6 +48,7 @@ class Canary(db.Model):
     criteria = db.Column('criteria', JSON)
     health = db.Column('health', db.String(256))
     updated_at = db.Column('updated_at', db.DateTime())
+    history = db.Column('history', JSON)
     project_id = db.Column(db.Integer, db.ForeignKey('projects.id'))
     results = db.relationship('Results', backref='canary', lazy='dynamic')
 
@@ -57,14 +61,20 @@ class Canary(db.Model):
         self.status = status
         self.criteria = criteria
         self.health = health
+        self.history = {"{}".format(datetime.utcnow()): health}
         self.updated_at = updated_at or datetime.utcnow()
         self.id = id
         self.project_id = project_id
 
-    def canary_to_json(self, **kwargs):
-        update_health = kwargs.get('update_health')
-        if update_health:
+    def update_health(self, new_health):
+        if new_health and new_health != self.health:
+            self.health = new_health
             self.updated_at = datetime.utcnow()
+            new_history = copy.deepcopy(self.history)
+            new_history["{}".format(datetime.utcnow())] = new_health
+            self.history = new_history
+
+    def canary_to_json(self):
         return {
             'name': self.name,
             'description': self.description,
@@ -72,9 +82,9 @@ class Canary(db.Model):
             'status': self.status,
             'criteria': self.criteria,
             'health': self.health,
-            'updated_at' : self.updated_at,
+            'updated_at': self.updated_at,
+            'history': self.history,
             'id': self.id
-
         }
 
 
