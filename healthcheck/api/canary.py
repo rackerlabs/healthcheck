@@ -2,14 +2,12 @@ from datetime import datetime
 from flask import jsonify, request
 from sqlalchemy import and_, text
 import pygal
-
 from healthcheck import db
 from healthcheck.data.models import Canary, Results
 from healthcheck.api import api
 from healthcheck.api.errors import bad_request
 from healthcheck.worker.tasks import process_trend
 from pygal.style import Style
-
 
 custom_style = Style(
     background='transparent',
@@ -40,7 +38,6 @@ def get_trend(project_id, canary_id):
                                         results_list=results_list)
     results_list, values = analysis_call.wait()
     labels = format_datetime(values=values, resolution=resolution)
-
     threshold_list = []
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
