@@ -17,8 +17,8 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
         'postgresql://postgres@localhost:5432/canaryDB'
-    CELERY_BROKER_URL = 'redis://192.168.99.101:6379/0'
-    CELERY_RESULT_BACKEND = 'redis://192.168.99.101:6379/0'
+    CELERY_BROKER_URL = 'redis://192.168.99.100:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://192.168.99.100:6379/0'
     API_URL = 'http://localhost:5000'
 
 

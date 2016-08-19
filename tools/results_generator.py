@@ -8,7 +8,7 @@ import argparse
 
 class ResultGen:
     def __init__(self):
-        self.api_client = APIClient(base_url="http://localhost:5000")
+        self.api_client = APIClient(base_url="http://192.168.99.100:5000")
 
     def generate_time(self, interval, current):
         value = interval.split()

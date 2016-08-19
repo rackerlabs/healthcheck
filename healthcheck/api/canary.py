@@ -16,20 +16,19 @@ def get_trend(project_id, canary_id):
     interval = request.args.get('interval')
     resolution = request.args.get('resolution')
     threshold = request.args.get('threshold')
-    query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - "
-                        "INTERVAL '{}'".format(interval))
-    results = Results.query.filter(and_(Results.canary_id == canary_id,
-                                        Results.created_at >= query_string))
-    results_list = []
-    for result in results:
-        results_list.append(result.results_to_json())
+    # query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - "
+    #                     "INTERVAL '{}'".format(interval))
+    # results = Results.query.filter(and_(Results.canary_id == canary_id,
+    #                                     Results.created_at >= query_string))
+    # results_list = []
+    # for result in results:
+    #     results_list.append(result.results_to_json())
 
     start_time = datetime.utcnow()
     analysis_call = process_trend.delay(resolution=resolution,
                                         threshold=threshold,
                                         interval=interval,
-                                        start_time=start_time,
-                                        results_list=results_list)
+                                        start_time=start_time)
     results_list, values = analysis_call.wait()
     labels = format_datetime(values=values, resolution=resolution)
     line = pygal.Line()
