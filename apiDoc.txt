@@ -1,0 +1,416 @@
+PROJECT
+
+    POST /projects
+    This operation registers a new project. Name and email fields cannot be empty, The unique id and name of the project is returned on success
+    The request and response data format is json.
+
+        Request Header:
+            Content-Type: application/json
+            Accept: application/json
+
+        Request Body:
+            {
+                    "name" : "canary service project",
+                    "email": “test@rackspace.com“,
+                    "description": "A canary service that will monitor, keep track, and trend of
+                                    test results and perform alarming service when necessary”,
+                    "dependencies" : [ projectX, ProjectY, projectZ ]	
+
+
+            }
+
+
+        Response Header:
+            Status Code: 201 Created
+            Content-Type: application/json
+
+        Response Body:
+            {
+                    "id" : 1,
+                    "name" : "canary service project"
+            }
+
+
+    GET /projects
+    This operation retrieves a list of all projects
+
+        Request Header:
+            Content-Type: application/json
+            Accept : application/json
+
+
+        Response Header:
+            Status Code: 200 OK
+            Content-Type: application/json
+        Response Body:
+            {
+                "projects" : [
+                    {
+                        "name" : "Health Check as a Service",
+                        "email": "test@rackspace.com",
+                        "description": "A canary service that will monitor, keep track, and trend of
+                                        test results and perform alarming service when necessary”,
+                        "dependencies" : [ projectX, ProjectY, projectZ ]
+                    },
+
+                    {
+                        "name" : "canary",
+                        "email": "test@rackspace.com",
+                        "description": "”,
+                        "dependencies" : [ projectX, ProjectY, projectZ ]
+                    }
+
+                   ]
+
+            }
+
+
+    GET /projects/<project_id>
+        This operation retrieves a project
+
+            Request Header:
+                Content-Type: application/json
+                Accept : application/json
+
+            Response Header:
+                Status Code: 200 OK
+                Content-Type: application/json
+            Response Body:
+                {
+                        "name" : "Health Check as a Service",
+                        "email": "test@rackspace.com",
+                        "description": "A canary service that will monitor, keep track, and trend of
+                                        test results and perform alarming service when necessary”,
+                        "dependencies" : [ projectX, ProjectY, projectZ ]
+                }
+
+
+    PUT /projects/<project_id>
+    This operation updates attributes of a project
+
+        Request Header:
+            Content-Type: application/json
+            Accept : application/json
+        Request Body:
+            {
+                    "name" : "Health Check"
+            }
+
+        Response Header:
+            Status Code: 200 OK
+            Content-Type: application/json
+        Response Body:
+            {
+                    "name" : "Health Check",
+                    "email": “test@rackspace.com“,
+                    "description": "A canary service that will monitor, keep track, and trend of
+                                    test results and perform alarming service when necessary”,
+                    "dependencies" : [ projectX, ProjectY, projectZ ]
+            }
+
+
+    DELETE /projects/<project_id>
+    This operation will delete a project.
+
+        Request Header:
+            Content-Type: application/json
+
+        Response Header:
+            Status Code: 204 OK
+            Content-Type: application/json
+
+
+
+CANARY
+
+    POST /projects/<project_id>/canary
+
+    This operation registers a canary. criteria and meta_data fields are json objects. Resolution can only be hours or
+    days.
+
+        Request Header:
+            Content-Type: application/json
+            Accept: application/json
+
+        Request Body:
+                {
+                    "name" : "new canary",
+                    "description": "Tests that API responds with correct status code for test cases",
+                    "meta_data": {  "region": "Austin"
+                    },
+                    "criteria" : {
+                         "resolution" : "1 hours",
+			             "threshold" : 80,
+			             "result_sample_size": 10
+			         }
+                }
+
+
+        Response Header:
+            Status Code: 201 Created
+            Content-Type: application/json
+
+        Response Body:
+            {
+                "name": "new canary",
+                "description": "Tests that API responds with correct status code for test cases",
+                "meta_data": {"region" : "Austin"},
+                "status": "ACTIVE",
+                "criteria": {
+                             "resolution" : "1 hours",
+                             "threshold" : 80,
+                             "result_sample_size": 10
+                },
+                "health": "GREEN",
+                "Id" : 1
+
+            }
+
+
+
+    PUT /projects/<project_id>/canary/<canary_id>
+
+    This operation updates the value of attributes of a canary
+
+        Request Header:
+            Content-Type: application/json
+            Accept : application/json
+
+        Request Body:
+             {
+                    "name" : "API calls test"
+             }
+
+
+        Response Header:
+            Status Code: 200 OK
+            Content-Type: application/json
+
+
+        Response Body:
+            {
+                    "name" : "API calls test",
+                    "description": "Tests that the API responds with correct status code for test cases",
+                    "meta_data" : {"region" : "Austin"},
+                    "status" : "ACTIVE",
+                    "criteria" : {
+                         "resolution" : "1 days",
+			             "threshold" : 80,
+			             "result_sample_size": 10
+			         },
+			         "health" : "GREEN",
+			         "id" : 1
+            }
+
+
+    DELETE /projects/<project_id>/canary/<canary_id>
+
+    This operation will first disable and then if called again, delete a canary.
+
+        Request Header:
+            Content-Type: application/json
+
+        Response Header:
+            Status Code: 204 No Content
+            Content-Type: application/json
+
+
+
+
+    GET /projects/<project_id>/canary
+        This operation retrieves all canaries whose project_id matches the project_id in the url and is also currently active.
+
+            Request Header:
+                Content-Type: application/json
+                Accept : application/json
+
+
+            Response Header:
+                Status Code: 200 OK
+                Content-Type: application/json
+            Response Body:
+                {
+                    "canaries" : [
+                        {
+
+                            "name" : "API calls test",
+                            "description": "Tests that the API responds with correct status code for test cases",
+                            "meta_data" : {"region" : "Austin"},
+                            "status" : "ACTIVE",
+                            "criteria" : {
+                                 "resolution" : "1 days",
+                                 "threshold" : 80,
+                                 "result_sample_size": 10
+                             },
+                             "health" : "GREEN",
+                             "id" : 1
+                        },
+
+                        {
+                            "name" : "API calls test",
+                            "description": "Tests that the API responds with correct status code for test cases",
+                            "meta_data" : {"region" : "Austin"},
+                            "status" : "ACTIVE",
+                            "criteria" : {
+                                 "resolution" : "1 days",
+                                 "threshold" : 80,
+                                 "result_sample_size": 10
+                             },
+                             "health" : "GREEN",
+                             "id" : 2
+
+                        }
+
+                    ]
+
+                }
+
+
+
+
+    GET /projects/<project_id>/canary/<canary_id>
+
+    This operation retrieves a canary
+
+        Request Header:
+            Content-Type: application/json
+            Accept : application/json
+
+        Response Header:
+            Status Code: 200 OK
+            Content-Type: application/json
+
+        Response Body:
+            {
+                    "name" : "API calls test",
+                    "description": "Tests that the API responds with correct status code for test cases",
+                    "meta_data" : {"region" : "Austin"},
+                    "status" : "ACTIVE",
+                    "criteria" : {
+                         "resolution" : "1 days",
+                         "threshold" : 80,
+                         "result_sample_size": 10
+                     },
+                     "health" : "GREEN",
+                     "id" : 1
+            }
+
+
+
+RESULTS
+
+    POST /projects/<project_id>/canary/<canary_id>/results
+
+    This operation posts results for a canary.
+        Request Header:
+            Content-Type: application/json
+
+        Request Body:
+            {
+
+                    "status" : "pass",
+                    "failure_details" : ""
+
+            }
+
+
+        Response Header:
+            Status Code: 201 Created
+            Content-Type: application/json
+
+        Response Body:
+            {
+                "status": "pass",
+                "failure_details":"",
+                "created_at": "2016-07-31 23:24:20.33441",
+                "id": 1
+
+            }
+
+    GET /projects/<project_id>/canary/<canary_id>/results/<result_id>
+
+    This operation will retrieve a result.
+
+        Request Header:
+            Content-Type: application/json
+
+        Response Header:
+            Status Code: 200 OK
+            Content-Type: application/json
+
+        Response Body:
+            {
+                "status": "pass",
+                "failure_details":"",
+                "created_at": "2016-07-31 23:24:20.33441",
+                "id": 1
+            }
+
+
+
+    GET /projects/<project_id>/canary/<canary_id>/results
+
+    This operation will retrieve all the results whose canary_id matches the specified canary_id
+
+        Request Header:
+            Content-Type: application/json
+
+        Response Header:
+            Status Code: 200 OK
+            Content-Type: application/json
+
+        Response Body:
+            "results":
+               [
+                    {
+                        "status": "pass",
+                        "failure_details":"",
+                        "created_at": "2016-07-31 23:24:20.33441",
+                        "id": 1
+                    },
+                    {
+                        "status": "pass",
+                        "failure_details":"",
+                        "created_at": "2016-07-31 23:25:23.33441",
+                        "id": 2
+                    }
+               [
+
+
+    PUT /projects/<project_id>/canary/<canary_id>/results/<result_id>
+
+    This operation allows to manually update the results of a canary
+
+        Request Header:
+            Content-Type: application/json
+        Request Body:
+            {
+                    "status" : "fail",
+                    "failure_details" : "manually stopped test"
+            }
+
+
+        Response Header:
+            Status Code: 200 OK
+            Content-Type: application/json
+
+
+        Response Body:
+            {
+                    “status” : “fail”,
+                    "failure_details" : "manually stopped test",
+                    "created_at": "2016-07-31 23:25:23.33441",
+                    "id": 2
+            }
+
+
+    DELETE /projects/<project_id>/canary/<canary_id>/results/<result_id>
+
+    This operation will delete a test result.
+
+            Request Header:
+                Content-Type: application/json
+
+            Response Header:
+                Status Code: 204 No Content
+                Content-Type: application/json
