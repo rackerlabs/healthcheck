@@ -1,7 +1,7 @@
 from flask import jsonify, request
 from sqlalchemy import and_, text
 from healthcheck import db
-from healthcheck.data.models import Results
+from healthcheck.data.models import Results, Canary
 from healthcheck.api import api
 from healthcheck.api.errors import bad_request
 from healthcheck.worker.tasks import process_canary
@@ -34,10 +34,10 @@ def get_results(project_id, canary_id):
                             "'{}'".format(interval))
         all_results = Results.query.filter(
             and_(Results.canary_id == canary_id,
-                 Results.created_at >= query_string))\
+                 Results.created_at >= query_string)) \
             .order_by(Results.created_at.desc())
     else:
-        all_results = Results.query.filter_by(canary_id=canary_id).\
+        all_results = Results.query.filter_by(canary_id=canary_id). \
             order_by(Results.created_at.desc())
     result_list = []
     for obj in all_results:
@@ -51,7 +51,9 @@ def get_results(project_id, canary_id):
            '<int:result_id>', methods=['GET'])
 def get_result(project_id, canary_id, result_id):
     result = Results.query.get(result_id)
-    if result is None or result.canary_id != canary_id:
+    canary = Canary.query.get(canary_id)
+    if result is None or result.canary_id != canary_id or canary.project_id \
+            != project_id:
         return bad_request('result not found')
     get_response = jsonify(**result.results_to_json())
     get_response.status_code = 200
@@ -67,7 +69,7 @@ def edit_result(project_id, canary_id, result_id):
     data = request.get_json()
     result.status = data.get('status') or result.status
     result.failure_details = data.get('failure_details') or \
-        result.failure_details
+                             result.failure_details
     db.session.commit()
     put_response = jsonify(**result.results_to_json())
     put_response.status_code = 200
