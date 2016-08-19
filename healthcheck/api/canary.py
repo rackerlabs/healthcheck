@@ -15,6 +15,73 @@ custom_style = Style(
     range=(0, 100),
     colors=('#808080', '#0000FF'))
 
+history_style = Style(
+    background='transparent',
+    plot_background='transparent',
+    colors=('#808080', '#0000FF'))
+
+
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>/history',
+           methods=['GET'])
+def get_history(project_id, canary_id):
+    canary = Canary.query.get(canary_id)
+    if canary is None or canary.project_id != project_id:
+        return bad_request('canary not found')
+    history = canary.history
+    time_list = []
+    health_list = []
+    for key, value in sorted(history.items()):
+        time_list.append(key)
+        health_list.append(value)
+    labels = format_datetime(values=time_list, resolution="1 days")
+    line = pygal.Line(width=1000, height=800, style=history_style)
+    line.title = "Canary History Graph"
+    line.x_labels = labels
+
+    # Style 1
+    # line.y_labels = [
+    #     {
+    #         'value': 1,
+    #         'label': 'Green'
+    #     },
+    #     {
+    #         'value': 0,
+    #         'label': 'Red'
+    #     }
+    # ]
+    # line.add('Health', [{'value': 1,'node': {'r': 4},'style':'fill:green'}
+    #                     if x == "GREEN"
+    #                     else
+    #                     {'value': 0 ,'node': {'r': 4}, 'style':'fill: red'}
+    #                     for x in health_list])
+
+    # Style 2
+    line.y_labels = [
+        {
+            'value': 3,
+            'label': ''
+        },
+        {
+            'value': 2,
+            'label': 'Green'
+        },
+        {
+            'value': 1,
+            'label': 'Red'
+        },
+        {
+            'value': 0,
+            'label': ''
+        }
+    ]
+    line.add('Health', [{'value': 2, 'node': {'r': 4}, 'style': 'fill:green'}
+                        if x == "GREEN"
+                        else
+                        {'value': 1, 'node': {'r': 4}, 'style': 'fill: red'}
+                        for x in health_list])
+
+    return line.render()
+
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',
            methods=['GET'])
