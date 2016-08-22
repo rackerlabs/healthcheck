@@ -9,7 +9,7 @@ from healthcheck.api.errors import bad_request
 from healthcheck.worker.tasks import process_trend
 from pygal.style import Style
 
-custom_style = Style(
+trend_style = Style(
     background='transparent',
     plot_background='transparent',
     range=(0, 100),
@@ -19,6 +19,10 @@ history_style = Style(
     background='transparent',
     plot_background='transparent',
     colors=('#808080', '#0000FF'))
+
+node = {'r': 4}
+red_style = 'fill: red'
+green_style = 'fill: green'
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/history',
@@ -37,25 +41,6 @@ def get_history(project_id, canary_id):
     line = pygal.Line(width=1000, height=800, style=history_style)
     line.title = "Canary History Graph"
     line.x_labels = labels
-
-    # Style 1
-    # line.y_labels = [
-    #     {
-    #         'value': 1,
-    #         'label': 'Green'
-    #     },
-    #     {
-    #         'value': 0,
-    #         'label': 'Red'
-    #     }
-    # ]
-    # line.add('Health', [{'value': 1,'node': {'r': 4},'style':'fill:green'}
-    #                     if x == "GREEN"
-    #                     else
-    #                     {'value': 0 ,'node': {'r': 4}, 'style':'fill: red'}
-    #                     for x in health_list])
-
-    # Style 2
     line.y_labels = [
         {
             'value': 3,
@@ -74,10 +59,10 @@ def get_history(project_id, canary_id):
             'label': ''
         }
     ]
-    line.add('Health', [{'value': 2, 'node': {'r': 4}, 'style': 'fill:green'}
+    line.add('Health', [{'value': 2, 'node': node, 'style': green_style}
                         if x == "GREEN"
                         else
-                        {'value': 1, 'node': {'r': 4}, 'style': 'fill: red'}
+                        {'value': 1, 'node': node, 'style': red_style}
                         for x in health_list])
 
     return line.render()
@@ -109,13 +94,13 @@ def get_trend(project_id, canary_id):
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
 
-    line = pygal.Line(width=1000, height=800, style=custom_style)
+    line = pygal.Line(width=1000, height=800, style=trend_style)
     line.title = "Canary Trend over {interval}".format(interval=interval)
     line.x_labels = labels
     line.add('Status', [
-        {'value': x, 'node': {'r': 4}, 'style': 'fill: green'}
+        {'value': x, 'node': node, 'style': green_style}
         if x >= int(threshold) else
-        {'value': x, 'node': {'r': 4}, 'style': 'fill: red'}
+        {'value': x, 'node': node, 'style': red_style}
         for x in results_list
         ])
     line.add("threshold", threshold_list, show_dots=False,
