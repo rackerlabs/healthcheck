@@ -41,12 +41,12 @@ class CanaryTest(unittest.TestCase):
         db.drop_all()
         self.app_context.pop()
 
-    def post_project(self):
+    def post_fake_project(self):
         return self.client.post('/api/projects',
                                 data=json.dumps(project_data),
                                 headers=header)
 
-    def post_canary(self):
+    def post_fake_canary(self):
         return self.client.post('/api/projects/1/canary',
                                 data=json.dumps(data),
                                 headers=header)
@@ -72,35 +72,28 @@ class CanaryTest(unittest.TestCase):
         return data
 
     def test_post_canary(self):
-        canary_project = self.post_project()
-        self.assertEquals(canary_project.status_code, 201)
-        self.assertEquals(json.loads(canary_project.data).get('id'), 1)
-        post_canary = self.post_canary()
+        post_canary = self.post_fake_canary()
         self.assertEquals(post_canary.status_code, 201)
         json_data = json.loads(post_canary.data)
-        self.assertEquals(sorted(json_data.items()),
-                          sorted(expected_data.items()),
-                          "EXPECTED {}, GOT {}".format(expected_data,
-                                                       json_data))
+        self.assertEquals(json_data.get('name'),
+                          expected_data.get('name'))
+        self.assertEquals(json_data.get('criteria'),
+                          expected_data.get('criteria'))
 
     def test_get_canary(self):
-        fake_project = self.post_project()
-        self.assertEquals(fake_project.status_code, 201)
-        self.assertEquals(json.loads(fake_project.data).get('id'), 1)
-        post_canary = self.post_canary()
+        post_canary = self.post_fake_canary()
         self.assertEquals(post_canary.status_code, 201)
         get_canary = self.client.get('api/projects/1/canary/1',
                                      content_type=content_type)
         self.assertEquals(get_canary.status_code, 200)
         json_data = json.loads(get_canary.data)
-        self.assertEquals(sorted(json_data.items()),
-                          sorted(expected_data.items()),
-                          "EXPECTED {}, GOT {}".format(expected_data,
-                                                       json_data))
+        self.assertEquals(json_data.get('name'),
+                          expected_data.get('name'))
+        self.assertEquals(json_data.get('criteria'),
+                      expected_data.get('criteria'))
+
 
     def test_get_canaries(self):
-        fake_project = self.post_project()
-        self.assertEquals(fake_project.status_code, 201)
         self.fake_canary()
         self.fake_canary()
         get_canary = self.client.get('api/projects/1/canary',
@@ -108,24 +101,22 @@ class CanaryTest(unittest.TestCase):
         self.assertEquals(get_canary.status_code, 200)
 
     def test_edit_canary(self):
-        fake_project = self.post_project()
-        self.assertEquals(fake_project.status_code, 201)
-        self.post_canary()
+        self.post_fake_canary()
         edit_response = self.client.put('api/projects/1/canary/1', data=json.dumps(
-            {'criteria': {'threshold': '100%', 'expected_run_frequency': '5hrs', 'result_sample_size': '10'}}),
-                                        headers={'content-type': 'application/json'})
+            {'criteria': {'threshold': 100, 'expected_run_frequency': '5hrs', 'result_sample_size': 10}}),
+                                        headers=header)
         self.assertEquals(edit_response.status_code, 200)
         response_data = json.loads(edit_response.data)
+        expected = {'criteria': {'threshold': 100, 'expected_run_frequency':
+            '5hrs', 'result_sample_size': 10}}
         self.assertEquals(response_data.get('criteria'),
-                          expected_data.get('criteria'),
-                          "EXPECTED {}, GOT {}".format({'threshold': '100%'},
+                          expected.get('criteria'),
+                          "EXPECTED {}, GOT {}".format(expected,
                                                        response_data.get(
                                                            'criteria')))
 
     def test_delete_canary(self):
-        fake_project = self.post_project()
-        self.assertEquals(fake_project.status_code, 201)
-        self.post_canary()
+        self.post_fake_canary()
         delete_canary = self.client.delete('api/projects/1/canary/1')
         self.assertEquals(delete_canary.status_code, 200)
         get_canary = self.client.get('api/projects/1/canary/1',

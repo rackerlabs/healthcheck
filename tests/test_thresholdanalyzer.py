@@ -1,6 +1,6 @@
 import unittest
-from app import create_app, db
-from app.worker.threshold_analyzer import ThresholdAnalyzer
+from healthcheck import create_app, db
+from healthcheck.worker.threshold_analyzer import ThresholdAnalyzer
 from mock import Mock
 
 

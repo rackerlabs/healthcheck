@@ -1,6 +1,7 @@
 import unittest
-from app import create_app, db
-from app.worker.trend_analyzer import TrendAnalyzer
+from healthcheck import create_app, db
+from healthcheck.worker.trend_analyzer import TrendAnalyzer
+from datetime import datetime
 
 results = [{u'status': u'pass', u'created_at': u'2016-08-08 07:11:34.878709',
             u'failure_details': u'', u'id': 1},
@@ -59,13 +60,17 @@ class TrendAnalyzerTest(unittest.TestCase):
         resolution = "1 days"
         threshold = 80
         results_list = results
+        interval = "3 days"
+        start_time = datetime.strptime("2016-08-10 14:00:44.878709", "%Y-%m-%d %H:%M:%S.%f")
         expected_status_list = ['green', 'green', 'red']
         expected_labels = ['2016-08-08 01:31:44.878709',
                            '2016-08-09 01:31:44.878709',
                            '2016-08-10 01:31:44.878709']
         status_list, labels = trend.process_trend(resolution=resolution,
                                                   threshold=threshold,
-                                                  results_list=results_list)
+                                                  results_list=results_list,
+                                                  interval=interval,
+                                                  start_time=start_time)
         self.assertEquals(status_list, expected_status_list,
                           "Status List result does not match")
 

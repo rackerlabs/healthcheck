@@ -1,6 +1,6 @@
 import unittest
-from app import create_app, db
-from app.worker.sample_size_analyzer import SampleSizeAnalyzer
+from healthcheck import create_app, db
+from healthcheck.worker.sample_size_analyzer import SampleSizeAnalyzer
 from mock import Mock
 
 canary_data = {'name': 'test canary',
