@@ -57,10 +57,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
                 fails += 1
         assert len(results_list) == (passes + fails)
         pass_percent = passes / len(results_list) * 100
-        if pass_percent > float(threshold):
-            return "green"
-        else:
-            return "red"
+        return pass_percent
 
     def time_conversion(self, time_value):
         value = time_value.split()

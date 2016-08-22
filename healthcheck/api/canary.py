@@ -8,6 +8,14 @@ from healthcheck.data.models import Canary, Results
 from healthcheck.api import api
 from healthcheck.api.errors import bad_request
 from healthcheck.worker.tasks import process_trend
+from pygal.style import Style
+
+
+custom_style = Style(
+    background='transparent',
+    plot_background='transparent',
+    range=(0, 100),
+    colors=('#808080', '#0000FF'))
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',
@@ -32,10 +40,22 @@ def get_trend(project_id, canary_id):
                                         results_list=results_list)
     results_list, values = analysis_call.wait()
     labels = format_datetime(values=values, resolution=resolution)
-    line = pygal.Line()
+
+    threshold_list = []
+    for i in range(len(results_list)):
+        threshold_list.append(int(threshold))
+
+    line = pygal.Line(width=1000, height=800, style=custom_style)
     line.title = "Canary Trend over {interval}".format(interval=interval)
     line.x_labels = labels
-    line.add("status", [1 if x == "green" else 0 for x in results_list])
+    line.add('Status', [
+        {'value': x, 'node': {'r': 4}, 'style': 'fill: green'}
+        if x >= int(threshold) else
+        {'value': x, 'node': {'r': 4}, 'style': 'fill: red'}
+        for x in results_list
+        ])
+    line.add("threshold", threshold_list, show_dots=False,
+             stroke_style={'width': 2})
     return line.render()
 
 
