@@ -1,6 +1,5 @@
 import React from 'react';
 import ResultsTable from './results-table';
-import ResultsMetadata from './results-metadata';
 
 var ResultsView = React.createClass({
 
