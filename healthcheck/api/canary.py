@@ -2,7 +2,6 @@ from datetime import datetime
 from flask import jsonify, request
 from sqlalchemy import and_, text
 import pygal
-
 from healthcheck import db
 from healthcheck.data.models import Canary, Results
 from healthcheck.api import api
@@ -10,12 +9,63 @@ from healthcheck.api.errors import bad_request
 from healthcheck.worker.tasks import process_trend
 from pygal.style import Style
 
-
-custom_style = Style(
+trend_style = Style(
     background='transparent',
     plot_background='transparent',
     range=(0, 100),
     colors=('#808080', '#0000FF'))
+
+history_style = Style(
+    background='transparent',
+    plot_background='transparent',
+    colors=('#808080', '#0000FF'))
+
+node = {'r': 4}
+red_style = 'fill: red'
+green_style = 'fill: green'
+
+
+@api.route('/projects/<int:project_id>/canary/<int:canary_id>/history',
+           methods=['GET'])
+def get_history(project_id, canary_id):
+    canary = Canary.query.get(canary_id)
+    if canary is None or canary.project_id != project_id:
+        return bad_request('canary not found')
+    history = canary.history
+    time_list = []
+    health_list = []
+    for key, value in sorted(history.items()):
+        time_list.append(key)
+        health_list.append(value)
+    labels = format_datetime(values=time_list, resolution="1 days")
+    line = pygal.Line(width=1000, height=800, style=history_style)
+    line.title = "Canary History Graph"
+    line.x_labels = labels
+    line.y_labels = [
+        {
+            'value': 3,
+            'label': ''
+        },
+        {
+            'value': 2,
+            'label': 'Green'
+        },
+        {
+            'value': 1,
+            'label': 'Red'
+        },
+        {
+            'value': 0,
+            'label': ''
+        }
+    ]
+    line.add('Health', [{'value': 2, 'node': node, 'style': green_style}
+                        if x == "GREEN"
+                        else
+                        {'value': 1, 'node': node, 'style': red_style}
+                        for x in health_list])
+
+    return line.render()
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',
@@ -40,18 +90,17 @@ def get_trend(project_id, canary_id):
                                         results_list=results_list)
     results_list, values = analysis_call.wait()
     labels = format_datetime(values=values, resolution=resolution)
-
     threshold_list = []
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
 
-    line = pygal.Line(width=1000, height=800, style=custom_style)
+    line = pygal.Line(width=1000, height=800, style=trend_style)
     line.title = "Canary Trend over {interval}".format(interval=interval)
     line.x_labels = labels
     line.add('Status', [
-        {'value': x, 'node': {'r': 4}, 'style': 'fill: green'}
+        {'value': x, 'node': node, 'style': green_style}
         if x >= int(threshold) else
-        {'value': x, 'node': {'r': 4}, 'style': 'fill: red'}
+        {'value': x, 'node': node, 'style': red_style}
         for x in results_list
         ])
     line.add("threshold", threshold_list, show_dots=False,
