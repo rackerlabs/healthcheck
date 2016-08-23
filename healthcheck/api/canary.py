@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import jsonify, request
 from sqlalchemy import and_, text
 import pygal
@@ -68,6 +68,8 @@ def get_history(project_id, canary_id):
     return line.render()
 
 
+
+
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',
            methods=['GET'])
 def get_trend(project_id, canary_id):
@@ -89,12 +91,14 @@ def get_trend(project_id, canary_id):
                                         start_time=start_time,
                                         results_list=results_list)
     results_list, values = analysis_call.wait()
-    labels = format_datetime(values=values, resolution=resolution)
+    labels, res_hour = format_datetime(values, resolution)
     threshold_list = []
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
 
-    line = pygal.Line(width=1000, height=800, style=trend_style)
+    line = pygal.Line(width=1000, height=800, style=trend_style,
+                      x_label_rotation=60, x_title='Resolution Hour: {}'.
+                      format(res_hour))
     line.title = "Canary Trend over {interval}".format(interval=interval)
     line.x_labels = labels
     line.add('Status', [
@@ -108,19 +112,37 @@ def get_trend(project_id, canary_id):
     return line.render()
 
 
+
+
 def format_datetime(values, resolution):
-    value = resolution.split()
+    res_value = resolution.split()
     format_values = []
-    if value[1] == "days":
-        for timee in values:
-            n_time = timee[5:16]
-            format_values.append(n_time)
-        return format_values
-    elif value[1] == "hours":
-        for timee in values:
-            n_time = timee[5:16]
-            format_values.append(n_time)
-        return format_values
+    offset = timedelta(days=1)
+    start = values[0][11:19]
+    before_res = datetime.strptime(values[0], "%Y-%m-%d %H:%M:%S.%f") - offset
+    after_res = datetime.strptime(values[len(values)-1], "%Y-%m-%d %H:%M:%S.%f") + offset
+    first_val = ""
+    if res_value[1] == "days":
+        for index, timee in enumerate(values):
+            if index == 0:
+                n_time = timee[5:10]
+                before = before_res.strftime('%m-%d')
+                format_values.append(before + ' to ' + n_time)
+                first_val = n_time
+            elif index == len(values) - 1:
+                n_time = timee[5:10]
+                after = after_res.strftime('%m-%d')
+                format_values.append(n_time + ' to ' + after)
+            else:
+                n_time = timee[5:10]
+                format_values.append(first_val + ' to ' + n_time)
+                first_val = n_time
+        return format_values, start
+    for timee in values:
+        print "IM HERE "
+        n_time = timee[5:16]
+        format_values.append(n_time)
+    return format_values, start
 
 
 @api.route('/projects/<int:project_id>/canary', methods=['POST'])
