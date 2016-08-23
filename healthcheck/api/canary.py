@@ -32,15 +32,18 @@ def get_history(project_id, canary_id):
     if canary is None or canary.project_id != project_id:
         return bad_request('canary not found')
     history = canary.history
+    line = pygal.Line(x_label_rotation=60, style=history_style)
     time_list = []
     health_list = []
     for key, value in sorted(history.items()):
         time_list.append(key)
         health_list.append(value)
-    labels = format_datetime(values=time_list, resolution="1 days")
-    line = pygal.Line(width=1000, height=800, style=history_style)
+
     line.title = "Canary History Graph"
-    line.x_labels = labels
+    line.x_labels = [
+        datetime.strptime(dt, "%Y-%m-%d %H:%M:%S.%f").strftime(
+            '%d, %b %Y at %I:%M:%S')
+        for dt in time_list]
     line.y_labels = [
         {
             'value': 3,
@@ -59,6 +62,7 @@ def get_history(project_id, canary_id):
             'label': ''
         }
     ]
+
     line.add('Health', [{'value': 2, 'node': node, 'style': green_style}
                         if x == "GREEN"
                         else
@@ -66,8 +70,6 @@ def get_history(project_id, canary_id):
                         for x in health_list])
 
     return line.render()
-
-
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',
@@ -112,15 +114,14 @@ def get_trend(project_id, canary_id):
     return line.render()
 
 
-
-
 def format_datetime(values, resolution):
     res_value = resolution.split()
     format_values = []
     offset = timedelta(days=1)
     start = values[0][11:19]
     before_res = datetime.strptime(values[0], "%Y-%m-%d %H:%M:%S.%f") - offset
-    after_res = datetime.strptime(values[len(values)-1], "%Y-%m-%d %H:%M:%S.%f") + offset
+    after_res = datetime.strptime(values[len(values) - 1],
+                                  "%Y-%m-%d %H:%M:%S.%f") + offset
     first_val = ""
     if res_value[1] == "days":
         for index, timee in enumerate(values):
