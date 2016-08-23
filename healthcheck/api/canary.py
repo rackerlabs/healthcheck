@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from flask import jsonify, request
+from flask import jsonify, request, render_template
 from sqlalchemy import and_, text
 import pygal
 from healthcheck import db
@@ -101,17 +101,19 @@ def get_trend(project_id, canary_id):
                       x_label_rotation=60, range=(0, 100),
                       x_title='Resolution Hour: {}'.
                       format(res_hour))
-    line.title = "Canary Trend over {interval}".format(interval=interval)
+    line.title = "Canary Results Trend over {interval}".format(
+        interval=interval)
     line.x_labels = labels
-    line.add('Status', [
+    line.add('Precentage Passing', [
         {'value': x, 'node': node, 'style': green_style}
         if x >= int(threshold) else
         {'value': x, 'node': node, 'style': red_style}
         for x in results_list
         ])
-    line.add("threshold", threshold_list, show_dots=False,
+    line.add("Threshold", threshold_list, show_dots=False,
              stroke_style={'width': 2})
-    return line.render()
+    graph_data = line.render_data_uri()
+    return render_template("graph.html", graph_data=graph_data)
 
 
 def format_datetime(values, resolution):
