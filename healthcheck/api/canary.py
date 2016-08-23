@@ -67,8 +67,8 @@ def get_history(project_id, canary_id):
                         else
                         {'value': 1, 'node': node, 'style': red_style}
                         for x in health_list])
-
-    return line.render()
+    graph_data = line.render_data_uri()
+    return render_template("graph.html", graph_data=graph_data)
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',

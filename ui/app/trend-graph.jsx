@@ -26,7 +26,7 @@ var TrendGraph = React.createClass({
     },
 
     componentWillUnmount: function() {
-        this.projectsRequest.abort();
+        this.canaryRequest.abort();
     },
 
     createGraph: function() {
@@ -62,6 +62,7 @@ var TrendGraph = React.createClass({
         return (
         <div>
              <div>
+                <h3>Results Trend Graph</h3>
                 <h4>Trend Graph Options</h4>
                   <div className="form-group">
                       <label className="rs-control-label">Interval</label>
