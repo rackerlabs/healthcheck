@@ -12,7 +12,6 @@ from pygal.style import Style
 trend_style = Style(
     background='transparent',
     plot_background='transparent',
-    range=(0, 100),
     colors=('#808080', '#0000FF'))
 
 history_style = Style(
@@ -99,7 +98,8 @@ def get_trend(project_id, canary_id):
         threshold_list.append(int(threshold))
 
     line = pygal.Line(width=1000, height=800, style=trend_style,
-                      x_label_rotation=60, x_title='Resolution Hour: {}'.
+                      x_label_rotation=60, range=(0, 100),
+                      x_title='Resolution Hour: {}'.
                       format(res_hour))
     line.title = "Canary Trend over {interval}".format(interval=interval)
     line.x_labels = labels
@@ -117,7 +117,7 @@ def get_trend(project_id, canary_id):
 def format_datetime(values, resolution):
     res_value = resolution.split()
     format_values = []
-    offset = timedelta(days=1)
+    offset = timedelta(days=int(res_value[0]))
     start = values[0][11:19]
     before_res = datetime.strptime(values[0], "%Y-%m-%d %H:%M:%S.%f") - offset
     after_res = datetime.strptime(values[len(values) - 1],
@@ -140,7 +140,6 @@ def format_datetime(values, resolution):
                 first_val = n_time
         return format_values, start
     for timee in values:
-        print "IM HERE "
         n_time = timee[5:16]
         format_values.append(n_time)
     return format_values, start
