@@ -63,7 +63,6 @@ var TrendGraph = React.createClass({
         <div>
              <div>
                 <h4>Trend Graph Options</h4>
-                <form className="form-inline" >
                   <div className="form-group">
                       <label className="rs-control-label">Interval</label>
                       <input
@@ -88,9 +87,7 @@ var TrendGraph = React.createClass({
                         onChange={this.thresholdChange}
                       />
                   </div>
-
-                  <button className="rs-btn rs-btn-primary" type="submit" onClick={this.updateGraph} >Submit</button>
-                  </form>
+                  <button className="rs-btn rs-btn-primary" type="button" onClick={this.updateGraph} >Submit</button>
              </div>
               <div dangerouslySetInnerHTML={ this.createGraph() } />
           </div>
