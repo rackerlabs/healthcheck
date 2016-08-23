@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import jsonify, request
 from sqlalchemy import and_, text
 import pygal
@@ -12,7 +12,6 @@ from pygal.style import Style
 trend_style = Style(
     background='transparent',
     plot_background='transparent',
-    range=(0, 100),
     colors=('#808080', '#0000FF'))
 
 history_style = Style(
@@ -32,15 +31,18 @@ def get_history(project_id, canary_id):
     if canary is None or canary.project_id != project_id:
         return bad_request('canary not found')
     history = canary.history
+    line = pygal.Line(x_label_rotation=60, style=history_style)
     time_list = []
     health_list = []
     for key, value in sorted(history.items()):
         time_list.append(key)
         health_list.append(value)
-    labels = format_datetime(values=time_list, resolution="1 days")
-    line = pygal.Line(width=1000, height=800, style=history_style)
+
     line.title = "Canary History Graph"
-    line.x_labels = labels
+    line.x_labels = [
+        datetime.strptime(dt, "%Y-%m-%d %H:%M:%S.%f").strftime(
+            '%d, %b %Y at %I:%M:%S')
+        for dt in time_list]
     line.y_labels = [
         {
             'value': 3,
@@ -59,6 +61,7 @@ def get_history(project_id, canary_id):
             'label': ''
         }
     ]
+
     line.add('Health', [{'value': 2, 'node': node, 'style': green_style}
                         if x == "GREEN"
                         else
@@ -89,12 +92,15 @@ def get_trend(project_id, canary_id):
                                         start_time=start_time,
                                         results_list=results_list)
     results_list, values = analysis_call.wait()
-    labels = format_datetime(values=values, resolution=resolution)
+    labels, res_hour = format_datetime(values, resolution)
     threshold_list = []
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
 
-    line = pygal.Line(width=1000, height=800, style=trend_style)
+    line = pygal.Line(width=1000, height=800, style=trend_style,
+                      x_label_rotation=60, range=(0, 100),
+                      x_title='Resolution Hour: {}'.
+                      format(res_hour))
     line.title = "Canary Trend over {interval}".format(interval=interval)
     line.x_labels = labels
     line.add('Status', [
@@ -109,18 +115,34 @@ def get_trend(project_id, canary_id):
 
 
 def format_datetime(values, resolution):
-    value = resolution.split()
+    res_value = resolution.split()
     format_values = []
-    if value[1] == "days":
-        for timee in values:
-            n_time = timee[5:16]
-            format_values.append(n_time)
-        return format_values
-    elif value[1] == "hours":
-        for timee in values:
-            n_time = timee[5:16]
-            format_values.append(n_time)
-        return format_values
+    offset = timedelta(days=int(res_value[0]))
+    start = values[0][11:19]
+    before_res = datetime.strptime(values[0], "%Y-%m-%d %H:%M:%S.%f") - offset
+    after_res = datetime.strptime(values[len(values) - 1],
+                                  "%Y-%m-%d %H:%M:%S.%f") + offset
+    first_val = ""
+    if res_value[1] == "days":
+        for index, timee in enumerate(values):
+            if index == 0:
+                n_time = timee[5:10]
+                before = before_res.strftime('%m-%d')
+                format_values.append(before + ' to ' + n_time)
+                first_val = n_time
+            elif index == len(values) - 1:
+                n_time = timee[5:10]
+                after = after_res.strftime('%m-%d')
+                format_values.append(n_time + ' to ' + after)
+            else:
+                n_time = timee[5:10]
+                format_values.append(first_val + ' to ' + n_time)
+                first_val = n_time
+        return format_values, start
+    for timee in values:
+        n_time = timee[5:16]
+        format_values.append(n_time)
+    return format_values, start
 
 
 @api.route('/projects/<int:project_id>/canary', methods=['POST'])

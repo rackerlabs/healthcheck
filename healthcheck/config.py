@@ -38,6 +38,7 @@ class TestingConfig(Config):
 
 
 class DockerConfig(Config):
+    DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'postgresql://postgres:password@db:5432/postgres'
     CELERY_BROKER_URL = 'redis://queue:6379/0'
