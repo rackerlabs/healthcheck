@@ -27,6 +27,7 @@ class ResultGen:
     def generate_test_results(self, project_id, canary_id, interval, count):
         seed()
         end_time = datetime.utcnow()
+        results = []
         for index in range(count):
             code = randint(0, 1)
             if code is 0:
@@ -45,6 +46,10 @@ class ResultGen:
                     'failure_details': failure_details,
                     'created_at': "{}".format(created_at)
                     }
+            results.append(data)
+
+        sorted_results = sorted(results, key=lambda k: k['created_at'])
+        for data in sorted_results:
             call = self.api_client.post_results(project_id, canary_id, data)
             if call.status_code != 201:
                 print "ERROR WHILE GENERATING RESULTS"
