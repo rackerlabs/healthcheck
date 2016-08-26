@@ -96,11 +96,10 @@ def get_trend(project_id, canary_id):
     threshold_list = []
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
-
     line = pygal.Line(style=trend_style,
                       x_label_rotation=60, range=(0, 100),
                       x_title='Resolution Hour: {}'.
-                      format(res_hour))
+                      format(res_hour), allow_interruptions=True)
     line.title = "Canary Results Trend over {interval}".format(
         interval=interval)
     line.x_labels = labels
