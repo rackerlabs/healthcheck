@@ -36,7 +36,7 @@ class ThresholdAnalyzer(BaseAnalyzer):
         pass_percent = passes / len(results) * 100
         if pass_percent > float(threshold):
             return "GREEN"
-        elif pass_percent >= float(threshold - low_threshold):
+        elif pass_percent >= float(low_threshold):
             return "YELLOW"
         else:
             return "RED"

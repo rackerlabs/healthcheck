@@ -47,12 +47,16 @@ def get_history(project_id, canary_id):
         for dt in time_list]
     line.y_labels = [
         {
-            'value': 3,
+            'value': 4,
             'label': ''
         },
         {
+            'value': 3,
+            'label': 'Green',
+        },
+        {
             'value': 2,
-            'label': 'Green'
+            'label': 'Yellow'
         },
         {
             'value': 1,
@@ -64,14 +68,18 @@ def get_history(project_id, canary_id):
         }
     ]
 
-    line.add('Health', [{'value': 2, 'node': node, 'style': green_style}
-                        if x == "GREEN"
-                        else
-                        {'value': 1, 'node': node, 'style': red_style}
-                        for x in health_list])
+    line.add('Health', [_get_value(x) for x in health_list])
     graph_data = line.render_data_uri()
     return render_template("graph.html", graph_data=graph_data)
 
+
+def _get_value(x):
+    if x == "GREEN":
+        return {'value': 3, 'node': node, 'style': green_style}
+    elif x == "YELLOW":
+        return {'value': 2, 'node': node, 'style': yellow_style}
+    else:
+        return {'value': 1, 'node': node, 'style': red_style}
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',
@@ -102,10 +110,9 @@ def get_trend(project_id, canary_id):
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
 
-    low = int(threshold) - int(low_threshold)
     low_threshold_list = []
     for i in range(len(results_list)):
-        low_threshold_list.append(int(low))
+        low_threshold_list.append(int(low_threshold))
 
     line = pygal.Line(style=trend_style,
                       x_label_rotation=60, range=(0, 100),
@@ -129,7 +136,6 @@ def get_trend(project_id, canary_id):
              stroke_style={'width': 2})
     graph_data = line.render_data_uri()
     return render_template("graph.html", graph_data=graph_data)
-
 
 
 def format_datetime(values, resolution):
@@ -236,3 +242,52 @@ def delete_canary(canary_id, project_id):
     response = jsonify("Disabled '%s' " % name)
     response.status_code = 200
     return response
+
+#
+# def get_history(project_id, canary_id):
+#     canary = Canary.query.get(canary_id)
+#     if canary is None or canary.project_id != project_id:
+#         return bad_request('canary not found')
+#     history = canary.history
+#     line = pygal.Line(x_label_rotation=60, style=history_style)
+#     time_list = []
+#     health_list = []
+#     for key, value in sorted(history.items()):
+#         time_list.append(key)
+#         health_list.append(value)
+#
+#     line.title = "Canary History Graph"
+#     line.x_labels = [
+#         datetime.strptime(dt, "%Y-%m-%d %H:%M:%S.%f").strftime(
+#             '%d, %b %Y at %I:%M:%S')
+#         for dt in time_list]
+#     line.y_labels = [
+#         {
+#             'value': 4,
+#             'label': ''
+#         },
+#         {
+#             'value': 3,
+#             'label': 'Green'
+#         },
+#         {
+#             'value': 2,
+#             'label': 'Yellow'
+#         },
+#         {
+#             'value': 1,
+#             'label': 'Red'
+#         },
+#         {
+#             'value': 0,
+#             'label': ''
+#         }
+#     ]
+#
+#     line.add('Health', [{'value': 3, 'node': node, 'style': green_style}
+#                         if x == "GREEN"
+#                         else
+#                         {'value': 1, 'node': node, 'style': red_style}
+#                         for x in health_list])
+#     graph_data = line.render_data_uri()
+#     return render_template("graph.html", graph_data=graph_data)

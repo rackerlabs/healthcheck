@@ -18,19 +18,20 @@ class SampleSizeAnalyzer(ThresholdAnalyzer):
                                             results=canary_results,
                                             low_threshold=low_threshold)
         if green_health != "GREEN" and current_health == "GREEN":
-            update = self.api_client.update_canary(project_id=project_id,
-                                                   canary_id=canary_id,
-                                                   health=green_health)
-            assert update.status_code == 200
+            self.update(project_id=project_id, canary_id=canary_id,
+                        new_health=green_health)
 
         elif green_health != "RED" and current_health == "RED":
-            update = self.api_client.update_canary(project_id=project_id,
-                                                   canary_id=canary_id,
-                                                   health=green_health)
-            assert update.status_code == 200
+            self.update(project_id=project_id, canary_id=canary_id,
+                        new_health=green_health)
 
         elif green_health != "YELLOW" and current_health == "YELLOW":
-            update = self.api_client.update_canary(project_id=project_id,
-                                                   canary_id=canary_id,
-                                                   health=green_health)
-            assert update.status_code == 200
+            self.update(project_id=project_id, canary_id=canary_id,
+                        new_health=green_health)
+
+
+    def update(self, project_id, canary_id, new_health):
+        update = self.api_client.update_canary(project_id=project_id,
+                                               canary_id=canary_id,
+                                               health=new_health)
+        assert update.status_code == 200
