@@ -12,7 +12,7 @@ from pygal.style import Style
 trend_style = Style(
     background='transparent',
     plot_background='transparent',
-    colors=('#808080', '#0000FF', "#FFC300"
+    colors=('#808080', '#229954', "#FFC300"
 ))
 
 history_style = Style(
@@ -73,12 +73,14 @@ def get_history(project_id, canary_id):
     return render_template("graph.html", graph_data=graph_data)
 
 
+
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',
            methods=['GET'])
 def get_trend(project_id, canary_id):
     interval = request.args.get('interval')
     resolution = request.args.get('resolution')
     threshold = request.args.get('threshold')
+    low_threshold = request.args.get('lowThreshold')
 
     query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - "
                         "INTERVAL '{}'".format(interval))
@@ -100,11 +102,10 @@ def get_trend(project_id, canary_id):
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
 
-    low_threshold = 10
-    low_threshold = int(threshold) - low_threshold
+    low = int(threshold) - int(low_threshold)
     low_threshold_list = []
     for i in range(len(results_list)):
-        low_threshold_list.append(int(low_threshold))
+        low_threshold_list.append(int(low))
 
     line = pygal.Line(style=trend_style,
                       x_label_rotation=60, range=(0, 100),
@@ -124,19 +125,11 @@ def get_trend(project_id, canary_id):
     line.add("Threshold", threshold_list, show_dots=False,
              stroke_style={'width': 2})
 
-    line.add("", low_threshold_list, show_dots=False,
+    line.add("Low Threshold", low_threshold_list, show_dots=False,
              stroke_style={'width': 2})
     graph_data = line.render_data_uri()
     return render_template("graph.html", graph_data=graph_data)
 
-
-# line.add('Percentage Passing', [
-#     {'value': x, 'node': node, 'style': green_style}
-#     if x >= int(threshold)
-#     else
-#     {'value': x, 'node': node, 'style': red_style}
-#     for x in results_list
-#     ])
 
 
 def format_datetime(values, resolution):
