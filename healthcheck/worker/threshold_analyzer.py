@@ -24,7 +24,7 @@ class ThresholdAnalyzer(BaseAnalyzer):
         config = get_config()
         self.api_client = APIClient(base_url=config.API_URL)
 
-    def analyze_results(self, threshold, results):
+    def analyze_results(self, threshold, results, low_threshold):
         passes = 0
         fails = 0
         for result in results:
@@ -35,9 +35,11 @@ class ThresholdAnalyzer(BaseAnalyzer):
         assert len(results) == (passes + fails)
         pass_percent = passes / len(results) * 100
         if pass_percent > float(threshold):
-            return True
+            return "GREEN"
+        elif pass_percent >= float(low_threshold):
+            return "YELLOW"
         else:
-            return False
+            return "RED"
 
     def get_canary_param(self, canary_id, project_id):
         canary = self.api_client.get_canary(project_id, canary_id)

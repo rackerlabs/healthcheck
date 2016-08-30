@@ -8,7 +8,8 @@ var TrendGraph = React.createClass({
             graph: "",
             interval: "7 days",
             resolution: "1 days",
-            threshold: "50"
+            threshold: "70",
+            lowThreshold: "60"
 
         }
     },
@@ -17,7 +18,8 @@ var TrendGraph = React.createClass({
         var url = "/api/projects/" + this.props.project_id + "/canary/" + this.props.canary_id +
                   "/trend?interval=" + this.state.interval +
                   "&resolution=" + this.state.resolution +
-                  "&threshold=" + this.state.threshold;
+                  "&threshold=" + this.state.threshold +
+                  "&lowThreshold=" + this.state.lowThreshold;
         this.canaryRequest = $.get(url, function(result) {
             this.setState({
                 graph: result
@@ -37,7 +39,8 @@ var TrendGraph = React.createClass({
         var url = "/api/projects/" + this.props.project_id + "/canary/" + this.props.canary_id +
                           "/trend?interval=" + this.state.interval +
                           "&resolution=" + this.state.resolution +
-                          "&threshold=" + this.state.threshold;
+                          "&threshold=" + this.state.threshold +
+                          "&lowThreshold=" + this.state.lowThreshold;
         this.canaryRequest = $.get(url, function(result) {
                     this.setState({
                         graph: result
@@ -55,6 +58,10 @@ var TrendGraph = React.createClass({
 
     thresholdChange: function(event) {
         this.setState({threshold: event.target.value});
+    },
+
+    lowThresholdChange: function(event) {
+        this.setState({lowThreshold: event.target.value});
     },
 
 
@@ -86,6 +93,14 @@ var TrendGraph = React.createClass({
                         type="number"
                         value={this.state.threshold}
                         onChange={this.thresholdChange}
+                      />
+                  </div>
+                  <div className="form-group">
+                      <label className="rs-control-label">Low Threshold</label>
+                      <input
+                        type="number"
+                        value={this.state.lowThreshold}
+                        onChange={this.lowThresholdChange}
                       />
                   </div>
                   <button className="rs-btn rs-btn-primary" type="button" onClick={this.updateGraph} >Submit</button>

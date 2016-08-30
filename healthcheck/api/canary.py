@@ -12,7 +12,8 @@ from pygal.style import Style
 trend_style = Style(
     background='transparent',
     plot_background='transparent',
-    colors=('#808080', '#0000FF'))
+    colors=('#808080', '#229954', "#FFFF00"
+            ))
 
 history_style = Style(
     background='transparent',
@@ -22,6 +23,7 @@ history_style = Style(
 node = {'r': 4}
 red_style = 'fill: red'
 green_style = 'fill: green'
+yellow_style = 'fill: yellow'
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/history',
@@ -45,12 +47,16 @@ def get_history(project_id, canary_id):
         for dt in time_list]
     line.y_labels = [
         {
-            'value': 3,
+            'value': 4,
             'label': ''
         },
         {
+            'value': 3,
+            'label': 'Green',
+        },
+        {
             'value': 2,
-            'label': 'Green'
+            'label': 'Yellow'
         },
         {
             'value': 1,
@@ -62,13 +68,18 @@ def get_history(project_id, canary_id):
         }
     ]
 
-    line.add('Health', [{'value': 2, 'node': node, 'style': green_style}
-                        if x == "GREEN"
-                        else
-                        {'value': 1, 'node': node, 'style': red_style}
-                        for x in health_list])
+    line.add('Health', [_get_value(x) for x in health_list])
     graph_data = line.render_data_uri()
     return render_template("graph.html", graph_data=graph_data)
+
+
+def _get_value(x):
+    if x == "GREEN":
+        return {'value': 3, 'node': node, 'style': green_style}
+    elif x == "YELLOW":
+        return {'value': 2, 'node': node, 'style': yellow_style}
+    else:
+        return {'value': 1, 'node': node, 'style': red_style}
 
 
 @api.route('/projects/<int:project_id>/canary/<int:canary_id>/trend',
@@ -77,6 +88,8 @@ def get_trend(project_id, canary_id):
     interval = request.args.get('interval')
     resolution = request.args.get('resolution')
     threshold = request.args.get('threshold')
+    low_threshold = request.args.get('lowThreshold')
+
     query_string = text("CURRENT_TIMESTAMP AT TIME ZONE 'UTC' - "
                         "INTERVAL '{}'".format(interval))
     results = Results.query.filter(and_(Results.canary_id == canary_id,
@@ -87,7 +100,6 @@ def get_trend(project_id, canary_id):
 
     start_time = datetime.utcnow()
     analysis_call = process_trend.delay(resolution=resolution,
-                                        threshold=threshold,
                                         interval=interval,
                                         start_time=start_time,
                                         results_list=results_list)
@@ -96,7 +108,20 @@ def get_trend(project_id, canary_id):
     threshold_list = []
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
-
+    low_threshold_list = []
+    for i in range(len(results_list)):
+        low_threshold_list.append(int(low_threshold))
+    percent_list = []
+    for result in results_list:
+        if result >= float(threshold):
+            percent_list.append(
+                {'value': result, 'node': node, 'style': green_style})
+        elif result >= float(low_threshold):
+            percent_list.append(
+                {'value': result, 'node': node, 'style': yellow_style})
+        else:
+            percent_list.append(
+                {'value': result, 'node': node, 'style': red_style})
     line = pygal.Line(style=trend_style,
                       x_label_rotation=60, range=(0, 100),
                       x_title='Resolution Hour: {}'.
@@ -104,13 +129,10 @@ def get_trend(project_id, canary_id):
     line.title = "Canary Results Trend over {interval}".format(
         interval=interval)
     line.x_labels = labels
-    line.add('Precentage Passing', [
-        {'value': x, 'node': node, 'style': green_style}
-        if x >= int(threshold) else
-        {'value': x, 'node': node, 'style': red_style}
-        for x in results_list
-        ])
+    line.add('Percentage Passing', percent_list)
     line.add("Threshold", threshold_list, show_dots=False,
+             stroke_style={'width': 2})
+    line.add("Low Threshold", low_threshold_list, show_dots=False,
              stroke_style={'width': 2})
     graph_data = line.render_data_uri()
     return render_template("graph.html", graph_data=graph_data)
