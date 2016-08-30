@@ -12,8 +12,8 @@ from pygal.style import Style
 trend_style = Style(
     background='transparent',
     plot_background='transparent',
-    colors=('#808080', '#229954', "#FFC300"
-))
+    colors=('#808080', '#229954', "#FFFF00"
+            ))
 
 history_style = Style(
     background='transparent',
@@ -100,7 +100,6 @@ def get_trend(project_id, canary_id):
 
     start_time = datetime.utcnow()
     analysis_call = process_trend.delay(resolution=resolution,
-                                        threshold=threshold,
                                         interval=interval,
                                         start_time=start_time,
                                         results_list=results_list)
@@ -109,11 +108,20 @@ def get_trend(project_id, canary_id):
     threshold_list = []
     for i in range(len(results_list)):
         threshold_list.append(int(threshold))
-
     low_threshold_list = []
     for i in range(len(results_list)):
         low_threshold_list.append(int(low_threshold))
-
+    percent_list = []
+    for result in results_list:
+        if result >= float(threshold):
+            percent_list.append(
+                {'value': result, 'node': node, 'style': green_style})
+        elif result >= float(low_threshold):
+            percent_list.append(
+                {'value': result, 'node': node, 'style': yellow_style})
+        else:
+            percent_list.append(
+                {'value': result, 'node': node, 'style': red_style})
     line = pygal.Line(style=trend_style,
                       x_label_rotation=60, range=(0, 100),
                       x_title='Resolution Hour: {}'.
@@ -121,17 +129,9 @@ def get_trend(project_id, canary_id):
     line.title = "Canary Results Trend over {interval}".format(
         interval=interval)
     line.x_labels = labels
-    line.add('Percentage Passing', [
-        {'value': x, 'node': node, 'style': green_style}
-        if x >= int(threshold)
-        else
-        {'value': x, 'node': node, 'style': red_style}
-        for x in results_list
-        ])
-
+    line.add('Percentage Passing', percent_list)
     line.add("Threshold", threshold_list, show_dots=False,
              stroke_style={'width': 2})
-
     line.add("Low Threshold", low_threshold_list, show_dots=False,
              stroke_style={'width': 2})
     graph_data = line.render_data_uri()
@@ -242,52 +242,3 @@ def delete_canary(canary_id, project_id):
     response = jsonify("Disabled '%s' " % name)
     response.status_code = 200
     return response
-
-#
-# def get_history(project_id, canary_id):
-#     canary = Canary.query.get(canary_id)
-#     if canary is None or canary.project_id != project_id:
-#         return bad_request('canary not found')
-#     history = canary.history
-#     line = pygal.Line(x_label_rotation=60, style=history_style)
-#     time_list = []
-#     health_list = []
-#     for key, value in sorted(history.items()):
-#         time_list.append(key)
-#         health_list.append(value)
-#
-#     line.title = "Canary History Graph"
-#     line.x_labels = [
-#         datetime.strptime(dt, "%Y-%m-%d %H:%M:%S.%f").strftime(
-#             '%d, %b %Y at %I:%M:%S')
-#         for dt in time_list]
-#     line.y_labels = [
-#         {
-#             'value': 4,
-#             'label': ''
-#         },
-#         {
-#             'value': 3,
-#             'label': 'Green'
-#         },
-#         {
-#             'value': 2,
-#             'label': 'Yellow'
-#         },
-#         {
-#             'value': 1,
-#             'label': 'Red'
-#         },
-#         {
-#             'value': 0,
-#             'label': ''
-#         }
-#     ]
-#
-#     line.add('Health', [{'value': 3, 'node': node, 'style': green_style}
-#                         if x == "GREEN"
-#                         else
-#                         {'value': 1, 'node': node, 'style': red_style}
-#                         for x in health_list])
-#     graph_data = line.render_data_uri()
-#     return render_template("graph.html", graph_data=graph_data)

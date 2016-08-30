@@ -10,7 +10,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         config = get_config()
         self.api_client = APIClient(base_url=config.API_URL)
 
-    def process_trend(self, resolution, threshold, interval, start_time,
+    def process_trend(self, resolution, interval, start_time,
                       results_list):
         results_list = sorted(results_list)
         resolution = self.time_conversion(resolution)
@@ -30,7 +30,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
                 analysis_list.append(results_list[index].get('status'))
             else:
                 labels.append("{}".format(border - resolution))
-                result = self.trend_analyzer(threshold, analysis_list)
+                result = self.trend_analyzer(analysis_list)
                 status_list.append(result)
                 analysis_list = []
                 analysis_list.append(results_list[index].get('status'))
@@ -38,7 +38,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
 
             if index == length - 1:
                 labels.append("{}".format(border - resolution))
-                result = self.trend_analyzer(threshold, analysis_list)
+                result = self.trend_analyzer(analysis_list)
                 status_list.append(result)
 
             index += 1
@@ -47,7 +47,7 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         print "LABELS IS ", labels
         return status_list, labels
 
-    def trend_analyzer(self, threshold, results_list):
+    def trend_analyzer(self,results_list):
         passes = 0
         fails = 0
         for result in results_list:
