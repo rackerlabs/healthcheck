@@ -1,6 +1,5 @@
 import unittest
 import json
-
 from healthcheck import create_app, db
 from healthcheck.data.models import Projects
 
@@ -119,3 +118,20 @@ class ProjectsTest(unittest.TestCase):
         self.helper_post()
         del_response = self.client.delete('api/projects/1')
         self.assertEquals(del_response.status_code, 204)
+
+    def test_404(self):
+        response = self.client.post('/api/wrong/url',
+                                    data=json.dumps(data),
+                                    headers=header)
+        self.assertTrue(response.status_code == 404)
+
+    def test_get_fake(self):
+        post_response = self.helper_post()
+        self.assertEquals(post_response.status_code, 201)
+        get_response = self.client.get('api/projects/2',
+                                       content_type=content_type)
+        self.assertEqual(get_response.status_code, 404)
+        response = json.loads(get_response.data)
+        self.assertEquals(response.get('message'), "project_id not found",
+                          "Expected 'project_id not found', got {}".
+                          format(response.get('message')))

