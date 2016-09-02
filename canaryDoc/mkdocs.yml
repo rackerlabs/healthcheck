@@ -1,0 +1,8 @@
+site_name: Health Check As A Service
+pages:
+- Home: index.md
+- API: api.md
+- Extra: canary.md
+
+
+
