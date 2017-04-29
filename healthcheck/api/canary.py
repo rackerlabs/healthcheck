@@ -103,12 +103,12 @@ def get_trend(project_id, canary_id):
     line.title = "Canary Results Trend over {interval}".format(
         interval=interval)
     line.x_labels = labels
-    line.add('Precentage Passing', [
+    line.add('Percentage Passing', [
         {'value': x, 'node': node, 'style': green_style}
         if x >= int(threshold) else
         {'value': x, 'node': node, 'style': red_style}
         for x in results_list
-        ])
+        ], allow_interruptions=True)
     line.add("Threshold", threshold_list, show_dots=False,
              stroke_style={'width': 2})
     graph_data = line.render_data_uri()
@@ -119,7 +119,8 @@ def format_datetime(values, resolution):
     res_value = resolution.split()
     format_values = []
     offset = timedelta(days=int(res_value[0]))
-    start = values[0][11:19]
+    start = datetime.strptime(values[0], "%Y-%m-%d %H:%M:%S.%f"). \
+        strftime('%H-%M-%S')
     before_res = datetime.strptime(values[0], "%Y-%m-%d %H:%M:%S.%f") - offset
     after_res = datetime.strptime(values[len(values) - 1],
                                   "%Y-%m-%d %H:%M:%S.%f") + offset
@@ -127,16 +128,19 @@ def format_datetime(values, resolution):
     if res_value[1] == "days":
         for index, timee in enumerate(values):
             if index == 0:
-                n_time = timee[5:10]
+                n_time = datetime.strptime(timee, "%Y-%m-%d %H:%M:%S.%f"). \
+                    strftime('%m-%d')
                 before = before_res.strftime('%m-%d')
                 format_values.append(before + ' to ' + n_time)
                 first_val = n_time
             elif index == len(values) - 1:
-                n_time = timee[5:10]
+                n_time = datetime.strptime(timee, "%Y-%m-%d %H:%M:%S.%f"). \
+                    strftime('%m-%d')
                 after = after_res.strftime('%m-%d')
                 format_values.append(n_time + ' to ' + after)
             else:
-                n_time = timee[5:10]
+                n_time = datetime.strptime(timee, "%Y-%m-%d %H:%M:%S.%f"). \
+                    strftime('%m-%d')
                 format_values.append(first_val + ' to ' + n_time)
                 first_val = n_time
         return format_values, start
