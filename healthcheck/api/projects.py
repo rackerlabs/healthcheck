@@ -17,7 +17,7 @@ def projects():
                                description=obj.description,
                                dependencies=obj.dependencies,
                                id=obj.id)
-            projects_list.append(project.to_json())
+            projects_list.append(project.project_to_json())
         get_response = jsonify(projects=projects_list)
         get_response.status_code = 200
         return get_response
@@ -38,10 +38,7 @@ def project(project_id):
         project = Projects.query.get(project_id)
         if project is None:
             return bad_request('project_id not found')
-        get_response = jsonify(name=project.name, email=project.email,
-                               description=project.description,
-                               dependencies=project.dependencies,
-                               id=project.id)
+        get_response = jsonify(project.project_to_json())
         get_response.status_code = 200
         return get_response
 
@@ -63,6 +60,6 @@ def project(project_id):
         project.dependencies = data.get('dependencies') or project.dependencies
         project.description = data.get('description') or project.description
         db.session.commit()
-        put_response = jsonify(project.to_json())
+        put_response = jsonify(project.project_to_json())
         put_response.status_code = 200
         return put_response

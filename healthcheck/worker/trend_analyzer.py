@@ -19,6 +19,9 @@ class TrendAnalyzer(BaseTrendAnalyzer):
         analysis_list = []
         time_format = '%Y-%m-%d %H:%M:%S.%f'
         interval = self.time_conversion(interval)
+        print "START", start_time
+        print "INTERVE", interval
+        print "RESOLUTION", resolution
         border = start_time - interval + resolution
         index = 0
         labels = []
@@ -33,8 +36,10 @@ class TrendAnalyzer(BaseTrendAnalyzer):
                 result = self.trend_analyzer(threshold, analysis_list)
                 status_list.append(result)
                 analysis_list = []
-                analysis_list.append(results_list[index].get('status'))
-                border = border + resolution
+                next_border = border + resolution
+                if created_at <= next_border:
+                    analysis_list.append(results_list[index].get('status'))
+                border = next_border
 
             if index == length - 1:
                 labels.append("{}".format(border - resolution))

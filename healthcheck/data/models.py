@@ -28,7 +28,7 @@ class Projects(db.Model):
                "description= '%s', dependencies= '%s']" \
                % (self.name, self.email, self.description, self.dependencies)
 
-    def to_json(self):
+    def project_to_json(self):
         return {
             'name': self.name,
             'email': self.email,

@@ -7,9 +7,7 @@ content_type = 'application/json'
 data = {'name': 'test canary',
         'description': 'A test canary',
         'meta_data': {'region': 'Hong Kong', 'data2': 'tweete'},
-        'criteria': {'threshold': '90%',
-                     'expected_run_frequency': '5hrs',
-                     'result_sample_size': '10'}
+        'criteria': {'threshold': 90, 'expected_run_frequency': '5hrs', 'result_sample_size': 10}
         }
 
 project_data = {'name': 'test project',
@@ -22,9 +20,7 @@ expected_data = {'name': 'test canary',
                  'meta_data': {'region': 'Hong Kong', 'data2': 'tweete'},
                  'status': 'ACTIVE',
                  'health': 'GREEN',
-                 'criteria': {'threshold': '90%',
-                              'expected_run_frequency': '5hrs',
-                              'result_sample_size': '10'},
+                 'criteria': {'threshold': 90, 'expected_run_frequency': '5hrs', 'result_sample_size': 10},
                  'id': 1
                  }
 
@@ -79,10 +75,10 @@ class CanaryTest(unittest.TestCase):
         post_canary = self.post_fake_canary()
         self.assertEquals(post_canary.status_code, 201)
         json_data = json.loads(post_canary.data)
-        self.assertEquals(sorted(json_data.items()),
-                          sorted(expected_data.items()),
-                          "EXPECTED {}, GOT {}".format(expected_data,
-                                                       json_data))
+        self.assertEquals(json_data.get('name'),
+                          expected_data.get('name'))
+        self.assertEquals(json_data.get('criteria'),
+                          expected_data.get('criteria'))
 
     def test_get_canary(self):
         post_canary = self.post_fake_canary()
@@ -91,10 +87,11 @@ class CanaryTest(unittest.TestCase):
                                      content_type=content_type)
         self.assertEquals(get_canary.status_code, 200)
         json_data = json.loads(get_canary.data)
-        self.assertEquals(sorted(json_data.items()),
-                          sorted(expected_data.items()),
-                          "EXPECTED {}, GOT {}".format(expected_data,
-                                                       json_data))
+        self.assertEquals(json_data.get('name'),
+                          expected_data.get('name'))
+        self.assertEquals(json_data.get('criteria'),
+                      expected_data.get('criteria'))
+
 
     def test_get_canaries(self):
         self.fake_canary()
@@ -105,18 +102,16 @@ class CanaryTest(unittest.TestCase):
 
     def test_edit_canary(self):
         self.post_fake_canary()
-        expected_data = {"criteria": {'threshold': '100%',
-                                      'expected_run_frequency': '5hrs',
-                                      'result_sample_size': '10'}}
-        edit_response = self.client.put('api/projects/1/canary/1',
-                                        data=json.dumps(expected_data),
+        edit_response = self.client.put('api/projects/1/canary/1', data=json.dumps(
+            {'criteria': {'threshold': 100, 'expected_run_frequency': '5hrs', 'result_sample_size': 10}}),
                                         headers=header)
-
         self.assertEquals(edit_response.status_code, 200)
         response_data = json.loads(edit_response.data)
+        expected = {'criteria': {'threshold': 100, 'expected_run_frequency':
+            '5hrs', 'result_sample_size': 10}}
         self.assertEquals(response_data.get('criteria'),
-                          expected_data.get('criteria'),
-                          "EXPECTED {}, GOT {}".format({'threshold': '100%'},
+                          expected.get('criteria'),
+                          "EXPECTED {}, GOT {}".format(expected,
                                                        response_data.get(
                                                            'criteria')))
 

@@ -6,7 +6,7 @@ class SampleSizeAnalyzer(ThresholdAnalyzer):
         ThresholdAnalyzer.__init__(self)
 
     def process_canary(self, canary_id, project_id):
-        current_health, criteria = self.get_canary_param(canary_id=canary_id,
+        current_health, criteria = self.get_canary_params(canary_id=canary_id,
                                                          project_id=project_id)
         sample_size = criteria.get('result_sample_size')
         threshold = criteria.get('threshold')

@@ -1,6 +1,5 @@
 import unittest
 import json
-
 from healthcheck import create_app, db
 from healthcheck.data.models import Projects
 
